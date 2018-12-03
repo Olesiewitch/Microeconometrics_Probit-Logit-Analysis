@@ -30,3 +30,4 @@ y <- yLatent %>% replace(yLatent<=0,0) %>% replace(yLatent>0,1)
 # Probit Model
 probit<-glm(yLatent ~ xNorm1, family=binomial(link="probit"))
 probit$coefficients
+A line I wrote on my local computer
