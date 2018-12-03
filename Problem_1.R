@@ -8,15 +8,18 @@ rm(list = ls())
 
 # set seed for comparibility
 set.seed(101)
-# Xo ~ N(10, 2²)
 ## set observation to 400
+#*****************************************************************************
+## Define Parameters
+beta0 <- -30
+beta1 <- 4
 xNorm1 <- rnorm(400,10,2) %>% round(2)
 
 # Error term
-errorTerm <- rnorm(400)
+errorTerm <- rnorm(400,0,1)
 
 # Latent Model for the joint multivariate Distribution
-yLatent <- -30 + 4 * xNorm1 + errorTerm
+yLatent <- beta0 + beta1 * xNorm1 + errorTerm
 ## transform Latent Variable into Bernoulli Variable
 ## y <- yLatent %>% 
 y <- yLatent %>% replace(yLatent<=0,0) %>% replace(yLatent>0,1)
