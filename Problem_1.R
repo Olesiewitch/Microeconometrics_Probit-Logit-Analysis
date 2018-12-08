@@ -153,7 +153,6 @@ k2 <- density(AMPEEst2)
 k3 <- density(AMPEEst3)
 
 
-plot(k1$x,k1$y,type="l",xlim = c(0,0.2), xlab = "Estimated AMPE j = 1", ylab = "Density", main ="Distribution 1")
-plot(k2$x,k2$y,type="l",xlim = c(0,0.2), xlab = "Estimated AMPE j = 2", ylab = "Density", main ="Distribution 2")
-plot(k3$x,k3$y,type="l",xlim = c(0,0.2), xlab = "Estimated AMPE j = 3", ylab = "Density", main ="Distribution 3")
-
+plot(k1$x,k1$y,type="l",xlim = c(0.07,0.12), xlab = "Estimated AMPE j = 1", ylab = "Density", main ="Distribution 1")
+plot(k2$x,k2$y,type="l",xlim = c(0.07,0.12), xlab = "Estimated AMPE j = 2", ylab = "Density", main ="Distribution 2")
+plot(k3$x,k3$y,type="l",xlim = c(0.07,0.12), xlab = "Estimated AMPE j = 3", ylab = "Density", main ="Distribution 3")
