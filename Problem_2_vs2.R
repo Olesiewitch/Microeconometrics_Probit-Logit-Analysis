@@ -59,10 +59,7 @@ xb1 <-probit$linear.predictors
 xb2 <-probit3$linear.predictors
 
 mpe_1<-(pnorm(xb1)*(probit$coefficients[2]))
-
-x<-c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
-
-mpe_2 <-(pnorm(xb2)*(probit$coefficients[2]*probit3$coefficients[3]*x))
+mpe_2 <-(pnorm(xb2)*(probit$coefficients[2]*probit3$coefficients[3]*data$ldl))
 
 ### Kevin I am stuck here. Can you continue? 
 
