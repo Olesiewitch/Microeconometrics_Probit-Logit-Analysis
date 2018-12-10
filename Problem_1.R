@@ -29,13 +29,16 @@ V3 <- matrix(c(4,3,3,4), nrow=2, ncol=2)
 
 # 1.a) Simulate three Datasets with Y, xNull and error -------------------
 
-## Simulate distributions with given means and Covariance
+## Simulate distributions with given means and Covariance; round xNull 
 distr1 <- rmvnorm(obs, mean = c(10,0) ,sigma = V1 , method = 'eigen') %>% as.data.frame() 
 names(distr1) = c('xNull','error1')
+distr1$xNull <- round(distr1$xNull,2)
 distr2 <- rmvnorm(obs, mean = c(10,0) ,sigma = V2 , method = 'eigen') %>% as.data.frame()
 names(distr2) = c('xNull','error2')
+distr2$xNull <- round(distr2$xNull,2)
 distr3 <- rmvnorm(obs, mean = c(10,0) ,sigma = V3 , method = 'eigen') %>% as.data.frame()
 names(distr3) = c('xNull','error3')
+distr3$xNull <- round(distr3$xNull,2)
 
 # Latent Model for the joint multivariate Distributions
 yLatent1 <- beta0 + beta1 * distr1[,"xNull"] + distr1[,"error1"]
@@ -87,6 +90,7 @@ for (i in 1:n){
   ## Population 1
   distr1 <- rmvnorm(obs, mean = c(10,0) ,sigma = V1 , method = 'eigen') %>% as.data.frame() 
   names(distr1) = c('xNull','error1')
+  distr1$xNull <- round(distr1$xNull,2)
   yLatent1 <- beta0 + beta1 * distr1[,"xNull"] + distr1[,"error1"]
   y1 <- yLatent1 %>% replace(yLatent1<=0,0) %>% replace(yLatent1>0,1)
   distr1 <- distr1 %>% mutate(Y = y1)
@@ -95,6 +99,7 @@ for (i in 1:n){
   ## Population 2
   distr2 <- rmvnorm(obs, mean = c(10,0) ,sigma = V2 , method = 'eigen') %>% as.data.frame() 
   names(distr2) = c('xNull','error2')
+  distr2$xNull <- round(distr2$xNull,2)
   yLatent2 <- beta0 + beta1 * distr2[,"xNull"] + distr2[,"error2"]
   y2 <- yLatent2 %>% replace(yLatent2<=0,0) %>% replace(yLatent2>0,1)
   distr2 <- distr2 %>% mutate(Y = y2)
@@ -103,6 +108,7 @@ for (i in 1:n){
   ## Population 3
   distr3 <- rmvnorm(obs, mean = c(10,0) ,sigma = V3 , method = 'eigen') %>% as.data.frame() 
   names(distr3) = c('xNull','error3')
+  distr3$xNull <- round(distr3$xNull,2)
   yLatent3 <- beta0 + beta1 * distr3[,"xNull"] + distr3[,"error3"]
   y3 <- yLatent3 %>% replace(yLatent3<=0,0) %>% replace(yLatent3>0,1)
   distr3 <- distr3 %>% mutate(Y = y3)
@@ -125,11 +131,14 @@ denBeta1 <- density(betaEst1, bw = "nrd0", adjust = 1, kernel = "gaussian")
 denBeta2 <- density(betaEst2, bw = "nrd0", adjust = 1, kernel = "gaussian")
 denBeta3 <- density(betaEst3, bw = "nrd0", adjust = 1, kernel = "gaussian")
 
-plot(denBeta1$x,denBeta1$y,type="l",xlim = c(min(betaEst1) ,max(betaEst1)), xlab = "Estimated Beta j = 1", ylab = "Density", main ="Population 1")
+plot(denBeta1$x,denBeta1$y,type="l",xlim = c(min(betaEst1) ,max(betaEst1)), 
+     xlab = "Estimated Beta j = 1", ylab = "Density", main ="Population 1")
 abline(v=mean(betaEst1))
-plot(denBeta2$x,denBeta2$y,type="l",xlim = c(min(betaEst2) ,max(betaEst2)), xlab = "Estimated Beta j = 2", ylab = "Density", main ="Population 2")
+plot(denBeta2$x,denBeta2$y,type="l",xlim = c(min(betaEst2) ,max(betaEst2)), 
+     xlab = "Estimated Beta j = 2", ylab = "Density", main ="Population 2")
 abline(v=mean(betaEst2))
-plot(denBeta3$x,denBeta3$y,type="l",xlim = c(min(betaEst3) ,max(betaEst3)), xlab = "Estimated Beta j = 3", ylab = "Density", main ="Population 3")
+plot(denBeta3$x,denBeta3$y,type="l",xlim = c(min(betaEst3) ,max(betaEst3)), 
+     xlab = "Estimated Beta j = 3", ylab = "Density", main ="Population 3")
 abline(v=mean(betaEst3))
 ## Question: Should we plot them next to each other or within one Plot?
 ## In the final Plots ranges should be calculated manually
@@ -187,6 +196,7 @@ for (i in 1:n){
   ## Population 1
   distr1 <- rmvnorm(obs, mean = c(10,0) ,sigma = V1 , method = 'eigen') %>% as.data.frame() 
   names(distr1) = c('xNull','error1')
+  distr1$xNull <- round(distr1$xNull,2)
   yLatent1 <- beta0 + beta1 * distr1[,"xNull"] + distr1[,"error1"]
   y1 <- yLatent1 %>% replace(yLatent1<=0,0) %>% replace(yLatent1>0,1)
   distr1 <- distr1 %>% mutate(Y = y1)
@@ -195,6 +205,7 @@ for (i in 1:n){
   ## Population 2
   distr2 <- rmvnorm(obs, mean = c(10,0) ,sigma = V2 , method = 'eigen') %>% as.data.frame() 
   names(distr2) = c('xNull','error2')
+  distr2$xNull <- round(distr2$xNull,2)
   yLatent2 <- beta0 + beta1 * distr2[,"xNull"] + distr2[,"error2"]
   y2 <- yLatent2 %>% replace(yLatent2<=0,0) %>% replace(yLatent2>0,1)
   distr2 <- distr2 %>% mutate(Y = y2)
@@ -203,6 +214,7 @@ for (i in 1:n){
   ## Population 3
   distr3 <- rmvnorm(obs, mean = c(10,0) ,sigma = V3 , method = 'eigen') %>% as.data.frame() 
   names(distr3) = c('xNull','error3')
+  distr3$xNull <- round(distr3$xNull,2)
   yLatent3 <- beta0 + beta1 * distr3[,"xNull"] + distr3[,"error3"]
   y3 <- yLatent3 %>% replace(yLatent3<=0,0) %>% replace(yLatent3>0,1)
   distr3 <- distr3 %>% mutate(Y = y3)
@@ -219,11 +231,14 @@ denAMPE2 <- density(AMPEEst2, bw = "nrd0", adjust = 2, kernel = "gaussian")
 denAMPE3 <- density(AMPEEst3, bw = "nrd0", adjust = 2, kernel = "gaussian")
 
 
-plot(denAMPE1$x,denAMPE1$y,type="l",xlim = c(min(AMPEEst1),max(AMPEEst1)), xlab = "Estimated AMPE j = 1", ylab = "Density", main ="Population 1")
+plot(denAMPE1$x,denAMPE1$y,type="l",xlim = c(min(AMPEEst1),max(AMPEEst1)), 
+     xlab = "Estimated AMPE j = 1", ylab = "Density", main ="Population 1")
 abline(v=mean(AMPEEst1))
-plot(denAMPE2$x,denAMPE2$y,type="l",xlim = c(min(AMPEEst2),max(AMPEEst2)), xlab = "Estimated AMPE j = 2", ylab = "Density", main ="Population 2")
+plot(denAMPE2$x,denAMPE2$y,type="l",xlim = c(min(AMPEEst2),max(AMPEEst2)), 
+     xlab = "Estimated AMPE j = 2", ylab = "Density", main ="Population 2")
 abline(v=mean(AMPEEst2))
-plot(denAMPE3$x,denAMPE3$y,type="l",xlim = c(min(AMPEEst3),max(AMPEEst3)), xlab = "Estimated AMPE j = 3", ylab = "Density", main ="Population 3")
+plot(denAMPE3$x,denAMPE3$y,type="l",xlim = c(min(AMPEEst3),max(AMPEEst3)), 
+     xlab = "Estimated AMPE j = 3", ylab = "Density", main ="Population 3")
 abline(v=mean(AMPEEst3))
 ## when asked for specific values  is the mean optimal?
 
@@ -257,4 +272,4 @@ abline(v=mean(AMPEEst3))
 
 ##------------------------------------------------------------------------------
 # Additional question: Can we explain why the density of the estimates 
-# (beta and AMPE) for population 2 is higher than for 1 and 3? 
+# (beta and AMPE) for population 2 is higher than for 1 and 3 at their means? 
