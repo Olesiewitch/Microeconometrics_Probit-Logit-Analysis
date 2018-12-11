@@ -17,7 +17,7 @@ data <- read.dta(file= "south_african_heart_disease_data.dta")
 probit<-glm(data$chd~data$ldl,family=binomial(link="probit"))
 summary(probit)
 
-##a) [0.5P] Can you learn anything from the estimated coefficients? Explain shortly. ## 
+##a) [0.5P] Can you learn anything from the estimated coefficients? Explain shortly. 
 
 ## In non-linear regression models, such as the probit model, coefficients cannot be interpreted as marginal effects. In probit model, the coefficients could 
 ## be interpreted with respect to the latent variable but since it has no specific unit, we cannot use any meaningful scale.
@@ -25,3 +25,37 @@ summary(probit)
 ## us the information whether we can reject null hypothesis at sufficiently small significance level. In presented model the estimated coefficient of ldl is positive 
 ## and significant at < 1% level. Therefore, ldl-cholesterol increases the chances of suffering from the disease and is highly significant.  
 
+
+## b) [0.5P] Are the S.E. valid, or do you need to adjust them for heteroscedasticity? Explain
+
+#### Since the probability of getting heart disease is Brenoulli distributed, it variance depends on P(yi=1|xi),which is a function of xi ("built-in" heteroscedasticity). The Maximum Likelihood Estimaton is calculated from given sample and derived based on the log-likelihood function which is a logarithmic transformation of joint 
+### probability density function, where distribution of y depends on x. Therefore, in the MLE heteroskedasticity in Var(y|x) is automatically accounted for and there
+### is no need to further test for it. The estimated Standard Errors are assimptotic (since they are simply the squareroot on the AVar(MLE))
+## and can be used to conduct the asimptotic t-test and calculate confidence intervals.   
+
+## c) [2P] Re-estimate the model from a) but this time include age in addition to ldl. You see that the estimated coefficient of ldl changes. 
+##  Explain why? Additionally, show that your explanation is supported by the data. 
+
+probit2<-glm(data$chd~data$ldl+data$age,family=binomial(link="probit"))
+summary(probit2)
+
+
+
+probit3<-glm(data$chd~poly(data$ldl,2, raw= TRUE),family=binomial(link="probit"))
+summary(probit3)
+
+## i. [1P] Based on the estimated coefficients from a) and d) draw the two resulting marginal probability effects of ldl as a function of 
+## ldl for ldl ∈ [1; 15] next to each other.
+
+summary(data$ldl)
+### Subsetting the data ( there are 2 values that are outside of [1;15] range ? 
+## Let's assume no
+
+## Running the probit for both models
+
+xb1 <-probit$linear.predictors
+xb2 <-probit3$linear.predictors
+
+mpe_1 <-(dnorm(xb1)*(probit$coefficients[2]))
+mpe_2 <-(dnorm(xb2)*(probit3$coefficients[2]+ 2*probit3$coefficients[3]*data$ldl))
+mpe_3<-(dnorm(xb2)*(probit3$coefficients[2]+ 2*probit3$coefficients[3]*data$ldl))
