@@ -115,7 +115,8 @@ plot(x = ldl,
      lwd=2, 
      xlim=c(1,15),
      ylim=c(min(mpe1, mpe2), max(mpe1, mpe2)),
-     main = "MPE for ldl in two probit models")
+     main = "MPE for ldl in two probit models",
+     ylab = "MPE")
 
 lines(x = ldl, y = mpe2, t= "l", col="blue", lwd=2)
 
@@ -124,7 +125,7 @@ legend("right", legend = c("just ldl", "ldl + ldl²"), fill=c("red", "blue"))
 
 ## + you used the actual "ldl"-values in the sample, I created them in [1,15]
 ## + for mpe2 you used the third coefficient when you took the derivative (ldl squared), I used the second (ldl)
-## + making sense of the plots: MPE never reaching 0
+## + making sense of the plots: MPE never reaching 0; why the shape with 3 extrema? (see for ldl in [1,30]
 
 summary(data$ldl)
 ### Subsetting the data ( there are 2 values that are outside of [1;15] range ? 
@@ -147,13 +148,21 @@ plot2<-plot(data$ldl,mpe_2)
 
 ## ii. [0.5P] Are any of the marginal probability effects linear in ldl? Explain why.
 
-## In Probit model, to calculate the MPE we are transforming the linear prediction of the beta estimators through the pdf, non of the the MEP is therefore linear. 
-## Moreover, as we are dealing with non-linear model the Marginal Probability Effect is estimated for every observation sperepatly. In the 
-##To obtain the "overall" average value for the whole sample we can calculate the mean of all the MPEs (recommendated) or take the MPE of an average for the sample ovservarion, however that average 
-## observation may acctually not exist in reality.  
+## -> Due to the nonlinearity in the Probit model that is induced by transforming the linear 
+##    predictors using the standard-normal CDF, the MPE are also nonlinear in "ldl". This can also be seen in the plot.
+##    An increase in "ldl" by one unit leads to an increment in the marginal probability by Phi(x'b)' * b' where
+##    Phi(x'b)' is the derivative of the standard-normal CDF evaluated at the linear predictor x'b (i.e., the standard-normal
+##    pdf) and b' is the derivate of the vector of coefficients with respect to the particular regressor for which the MPE
+##    is to be estimated. The value of the MPE with respect to that one regressor therefore depends on the value of all other
+##    regressors and is thus contingent on the individual observation. Furthermore, it is obtained by using the (nonlinear) 
+##    standard-normal pdf as a factor. Therefore, none of the MPEs can be linear.
+
+##   + taking the overall / average MPE: relevant to this question?
 
 
 ## iii. [1P] What is the advantage of the marginal probability effect based on the estimation in d) over the one based on a)? Explain shortly.
+
+## -> By adding the square of the "ldl" variable as a regressor in the Probit model, we can see whether or not ... [tbc]
 
 ## Adding ldl^2 variable allows us to estimate wether the marginal effect of ldl on probability increases or decreases as the ldl is higher, 
 ## as oppose to model a) where we assume stricktly linear of ldl on probability. 
@@ -165,20 +174,28 @@ plot2<-plot(data$ldl,mpe_2)
 ## This interpretation is not possible based on the estimation a), where we can only observed that increase in the ldl level increases the probability 
 ## of getting the heart disease. 
 
-## Kevin, maybe we can ilustrate this point with the graph as on the slide 83? 
+## + how to interpret graph on slide 84? why is it linear and does that change anything about our explanation?
+## + create a graph to illustrate this point as on the lecture slides  P(Y=1|X) = plot(ldl, pnorm(xb2), t="l", lwd=2, col="blue")
+##   but how is it related to MPE? MPE should be derivative of this, no? but when I plot my mpe2 along it, it is something else?
+##   also on slide 84 the blue line is not the derivative of the red line??
 
-## iv. [1.5P] Calculate and properly interpret both marginal probability effects for the mean value of ldl in the sample (You do not need to 
-## compute standard errors).
+## iv. [1.5P] Calculate and properly interpret both marginal probability effects for the mean value of ldl in the sample 
+##     (You do not need to compute standard errors).
 
-Probit_at_ldl_mean1<-probitmfx(data$chd~data$ldl,data=data,atmean=TRUE)
+Probit_at_ldl_mean1 <- probitmfx(data$chd~data$ldl,data=data,atmean=TRUE)
 Probit_at_ldl_mean2 <- probitmfx(data$chd~data$ldl+I(data$ldl^2),data=data,atmean=TRUE)
 Probit_at_ldl_mean1
 Probit_at_ldl_mean2
-## In the model a), dF/dx of ldl at mean is equal to 0.0609. 
-## Interpretation: At less then 1% sygniffiance level, the marginal probability in the sample suggest that for an individual with the exact mean characteristics
-## increase of their ldl-cholesterol by one unit, increases their probability of getting the heart disease by 6.09 procentage points. 
 
-## In model d), dF/dx of ldl at mean is equal to 0.1362 and of ldl^2 at mean is equal to - 0.006. 
+## -> In the model a), the estimated MPE dP/dx of "ldl" at its mean value is equal to 0.0609. This means that 
+##    for an individual with the exact mean characteristics on "ldl" an increase in "ldl" by one unit is
+##    leads to an increase in the estimated probability of getting a heart disease by 6.09 percentage points. 
+##    The probability of obtaining this estimate under the null hypotheses that the real AMPE is 0, is very low at p < 0.001.
+
+
+## [CONTINUE HERE]
+
+## -> In model d), dP/dx of "ldl" at its mean value is equal to 0.1362 and of ldl^2 at its mean value is equal to - 0.006. 
 
 ldl_ldlsq <- (-0.136/(2*(-0.006)))
 ldl_ldlsq
