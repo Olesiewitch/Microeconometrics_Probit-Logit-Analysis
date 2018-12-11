@@ -6,31 +6,42 @@ library(foreign)
 library(mfx)
 library(margins)
 
-## Instrictions: Load the dataset “south_african_heart_disease_data.dta” and estimate the effect of ldl-
+## Instructions: Load the dataset “south_african_heart_disease_data.dta” and estimate the effect of ldl-
 ##(bad)cholesterol (ldl) in blood on the probability of suffering from heart disease (chd equals 1 if one suffers from it). 
 
 ## Loading the data
 data <- read.dta(file= "south_african_heart_disease_data.dta") 
 
-## Estimating effect ch ~ ldl
+## Estimating effect: regressing chd on (chd ~ ldl):
 
 probit<-glm(data$chd~data$ldl,family=binomial(link="probit"))
 summary(probit)
 
-##a) [0.5P] Can you learn anything from the estimated coefficients? Explain shortly. 
+## a) [0.5P] Can you learn anything from the estimated coefficients? Explain shortly. 
 
-## In non-linear regression models, such as the probit model, coefficients cannot be interpreted as marginal effects. In probit model, the coefficients could 
-## be interpreted with respect to the latent variable but since it has no specific unit, we cannot use any meaningful scale.
-##Therefore, the coefficients give only the signs of the partial effect of each x on the response probability, and its statistical sygnificance by giving 
-## us the information whether we can reject null hypothesis at sufficiently small sygnificance level. In our model the estimated coefficient of ldl is 0.17 
-## and is sygnifficant at < 1% level. Conclusion: The ldl-cholesterol increases the chances of suffering from the disease and is higly sygnifficnat.  
+## -> In the nonlinear model (which the probit model is), the beta-coefficients 
+##    cannot be interpreted as marginal effects. But their sign does tell us the direction 
+##    of their effect (whether they increase or decrease the probability of the dependent
+##    variable being one) and the p-values also show us the probabilities of obtaining the
+##    respective observed effect sizes under the null hypothesis that the population-level 
+##    effect is zero. Therefore, we learn from this output that higher levels of "ldl" 
+##    (bad cholesterol) appear to be a risk factor for suffering from heart disease 
+##    (positive sign for ldl-regression-coefficient along with p < 0.001). 
+##
+##  + In probit model, the coefficients could be interpreted with respect to the latent variable 
+##    but since it has no specific unit, we cannot use any meaningful scale.
 
 ## b) [0.5P] Are the S.E. valid, or do you need to adjust them for heteroscedasticity? Explain
 
-##Under restrictive assumptions (i.e which includes homoscedasticity of error term), the Maximum Likelihood Estimator
+## Under restrictive assumptions (i.e which includes homoscedasticity of error term ), the Maximum Likelihood Estimator
 ## is consistent and asymptotically efficient; the MLE is the most precise estimator with the smallest variance. 
 ## Therefore, the SE are valid and there is no need to test for heteroscedasticity.  
 
+## + If there is no heteroscedasticity by assumption, doesn't the question become moot?
+## + does consistency of the estimator matter in this regard? consistency is about the mean 
+##   of the estimator's distribution but this question concerns the variance of the estimator, no?
+## + see the PDF-file from tutorial 3 on slides 22 and 23; there is no talk about the variance of the ML estimator at all;
+##   is more along the lines of "heteroscedasticity is intrinsically accounted for by the ML estimator using the Bernoulli pdf "
 
 ## c) [2P] Re-estimate the model from a) but this time include age in addition to ldl. You see that the estimated coefficient of ldl changes. 
 ##  Explain why? Additionally, show that your explanation is supported by the data. 
@@ -39,15 +50,25 @@ probit2<-glm(data$chd~data$ldl+data$age,family=binomial(link="probit"))
 summary(probit2)
 probit5 <-glm(data$chd~data$ldl*data$age,family=binomial(link="probit"))
 summary(probit5)
-## In both models, the coefficients are estimated under ceteris paribus assumtion, meaning that while estimating each of them we control for all other variables. 
-## If both variable were uncorralated, the coefficient of ldl should not chage in the second model; controling for age should have no impact on ldl. 
-## Therefore, seeing that the two coefficients for ldk are diffrent we may suspect ldl correlation with age. Sense check: the older people get, the more likely it is 
-## they will have higher level of ldl-cholesterol. Now, let's use data to prove it: 
+
+## -> In both models, the coefficients are estimated under the ceteris paribus assumption ("all else being equal"), 
+##    meaning that while estimating each of them we control for the effect of all other predictor variables in the model. 
+##    If both variables were independent, the coefficient of "ldl" should not change in the second model when controling 
+##    for "age". Therefore, seeing that the two coefficients for "ldl" have changed compared to the model without "age",
+##    we may suspect that "ldl" and "age" are not independent. Plausibility check: older people in the sample may tend to
+##    have higher levels of cholesterol. Now, let's check for that in the data:
+
+## + include interaction? I'd say no, especially because then the weights for ldl and ldl*age are n.s.
+## + "Therefore, seeing that the two coefficients for ldk are diffrent we may suspect ldl correlation with age." 
+##    whats the 2nd coef?
 
 correlation_ldl_age <- cor(data$ldl, data$age)
 print(correlation_ldl_age)
 
-##Bingo! Hiwever this question is for two pints, maybe too easy answer....
+##  -> Bingo! As expected, "ldl" and "age" are not indepentend. Age is very commonly related to higher chances of heart 
+##     disease and "ldl" is positively related to age. So in the first model, the "ldl" variable captured some of the 
+##     variance in "age". When explicitly entering "age" as a regressor, that part of the variance in "ldl" is partialed
+##     out. Accordingly, the regression weight for "ldl" changes. In this case, it decreased.
 
 ## d) Finally, estimate the model from a) but include ldl squared next to ldl as a control variable.
 
@@ -56,6 +77,54 @@ summary(probit3)
 
 ## i. [1P] Based on the estimated coefficients from a) and d) draw the two resulting marginal probability effects of ldl as a function of 
 ## ldl for ldl ∈ [1; 15] next to each other.
+
+## Extract regression coefficients:
+
+beta.1 <- as.numeric(probit$coefficients)
+beta.2 <- as.numeric(probit3$coefficients)
+
+## Prepare design matrices:
+
+ldl <- seq(1, 15, 0.01)
+ldl.square <- ldl^2
+int <- rep(1, length(ldl))
+
+designmat.1 <- as.matrix(data.frame("intercept" = int, 
+                                    "ldl" = ldl))
+
+designmat.2 <- as.matrix(data.frame("intercept" = int, 
+                                    "ldl" = ldl, 
+                                    "ldl.square" = ldl.square))
+
+## Calculate linear predictor:
+
+xb1 <- designmat.1 %*% beta.1
+xb2 <- designmat.2 %*% beta.2
+
+## Calculate marginal probability effect for each probit model:
+
+mpe1 <- dnorm(xb1)*beta.1[2]
+mpe2 <- dnorm(xb2)*(beta.2[2] + 2*beta.2[2])
+
+## Plot them together:
+
+plot(x = ldl, 
+     y = mpe1, 
+     t= "l", 
+     col="red", 
+     lwd=2, 
+     xlim=c(1,15),
+     ylim=c(min(mpe1, mpe2), max(mpe1, mpe2)),
+     main = "MPE for ldl in two probit models")
+
+lines(x = ldl, y = mpe2, t= "l", col="blue", lwd=2)
+
+legend("right", legend = c("just ldl", "ldl + ldl²"), fill=c("red", "blue"))
+
+
+## + you used the actual "ldl"-values in the sample, I created them in [1,15]
+## + for mpe2 you used the third coefficient when you took the derivative (ldl squared), I used the second (ldl)
+## + making sense of the plots: MPE never reaching 0
 
 summary(data$ldl)
 ### Subsetting the data ( there are 2 values that are outside of [1;15] range ? 
