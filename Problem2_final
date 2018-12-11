@@ -1,0 +1,27 @@
+### Assesment 1 , Part 2 
+
+##Preparing the enviroment 
+remove(list=ls())
+library(foreign)
+library(mfx)
+library(margins)
+
+## Instrictions: Load the dataset “south_african_heart_disease_data.dta” and estimate the effect of ldl-
+##(bad)cholesterol (ldl) in blood on the probability of suffering from heart disease (chd equals 1 if one suffers from it). 
+
+## Loading the data
+data <- read.dta(file= "south_african_heart_disease_data.dta") 
+
+## Estimating effect ch ~ ldl
+
+probit<-glm(data$chd~data$ldl,family=binomial(link="probit"))
+summary(probit)
+
+##a) [0.5P] Can you learn anything from the estimated coefficients? Explain shortly. ## 
+
+## In non-linear regression models, such as the probit model, coefficients cannot be interpreted as marginal effects. In probit model, the coefficients could 
+## be interpreted with respect to the latent variable but since it has no specific unit, we cannot use any meaningful scale.
+##Therefore, the coefficients give only the signs of the partial effect of each x on the response probability, and its statistical significance by giving 
+## us the information whether we can reject null hypothesis at sufficiently small significance level. In presented model the estimated coefficient of ldl is positive 
+## and significant at < 1% level. Therefore, ldl-cholesterol increases the chances of suffering from the disease and is highly significant.  
+
