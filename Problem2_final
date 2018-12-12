@@ -42,7 +42,21 @@ summary(probit)
 probit2<-glm(data$chd~data$ldl+data$age,family=binomial(link="probit"))
 summary(probit2)
 
+###   In the second model, the coefficients are estimated under the ceteris paribus assumption ("all else being equal"), 
+##    meaning that while estimating each of them we control for the effect of all other predictor variables in the model. 
+##    If both variables were independent, the coefficient of "ldl" should not change in the second model when controling 
+##    for "age". Therefore, seeing that the two coefficients for "ldl" have changed compared to the model without "age",
+##    we may suspect that "ldl" and "age" are not independent. Plausibility check: older people in the sample may tend to
+##    have higher levels of cholesterol. Now, let's check for that in the data:
 
+correlation_ldl_age <- cor(data$ldl, data$age)
+print(correlation_ldl_age)
+
+## Bingo! As expected, "ldl" and "age" are not independent and the level of ldl is dependent on age. In the first model, the "ldl" coefficient 
+## captured some of the "ldl" variations on "age". When explicitly entering "age" as a regressor, that part of the variance in "ldl" is removed. 
+
+
+## d) Finally, estimate the model from a) but include ldl squared next to ldl as a control variable.
 
 probit3<-glm(data$chd~poly(data$ldl,2, raw= TRUE),family=binomial(link="probit"))
 summary(probit3)
@@ -50,15 +64,15 @@ summary(probit3)
 ## i. [1P] Based on the estimated coefficients from a) and d) draw the two resulting marginal probability effects of ldl as a function of 
 ## ldl for ldl ∈ [1; 15] next to each other.
 
-summary(data$ldl)
-### Subsetting the data ( there are 2 values that are outside of [1;15] range ? 
-## Let's assume no
-
-## Running the probit for both models
+## Getting probit predictors for both models
 
 xb1 <-probit$linear.predictors
 xb2 <-probit3$linear.predictors
 
 mpe_1 <-(dnorm(xb1)*(probit$coefficients[2]))
 mpe_2 <-(dnorm(xb2)*(probit3$coefficients[2]+ 2*probit3$coefficients[3]*data$ldl))
-mpe_3<-(dnorm(xb2)*(probit3$coefficients[2]+ 2*probit3$coefficients[3]*data$ldl))
+
+plot1<-plot(data$ldl,mpe_1)
+plot2<-plot(data$ldl,mpe_2)
+
+
