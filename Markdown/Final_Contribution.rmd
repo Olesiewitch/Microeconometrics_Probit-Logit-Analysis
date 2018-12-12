@@ -5,8 +5,7 @@ date: "December, 2018"
 output: 
   pdf_document:
     latex_engine: xelatex
-fontsize: 11pt
-geometry: margin=1in
+fontsize: 10pt
 ---
 
 ## First Problem: (Simulation: Latent Variable, Probit Model):
@@ -18,7 +17,7 @@ $$
 $$
 \left( 
 \begin{array} { c } 
-{ X _ { 0 } } \\ { \varepsilon _ { 1 } ^ { 0 } } \end{array} \right) \sim N \left[ \left( \begin{array} { c } { 10 } \\ { 0 } \end{array} \right) , \left( \begin{array} { c c } { 2 ^ { 2 } } & { 0 } \\ { 0 } & { 1 } \end{array} \right) \right] , \left( \begin{array} { c } { X _ { 0 } } \\ { \varepsilon _ { 2 } ^ { * } } \end{array} \right) \sim N \left[ \left( \begin{array} { c } { 10 } \\ { 0 } \end{array} \right) , \left( \begin{array} { c c } { 2 ^ { 2 } } & { 0 } \\ { 0 } & { 2 ^ { 2 } } \end{array} \right) \right] , \left( \begin{array} { c } { X _ { 0 } } \\ { \varepsilon _ { 3 } ^ { * } } \end{array} \right) \sim N \left[ \left( \begin{array} { c } { 10 } \\ { 0 } \end{array} \right) , \left( \begin{array} { c c } { 2 ^ { 2 } } & { 3 } \\ { 3 } & { 2 ^ { 2 } } \end{array} 
+{ X _ { 0 } } \\ { \varepsilon _ { 1 } ^ { * } } \end{array} \right) \sim N \left[ \left( \begin{array} { c } { 10 } \\ { 0 } \end{array} \right) , \left( \begin{array} { c c } { 2 ^ { 2 } } & { 0 } \\ { 0 } & { 1 } \end{array} \right) \right] , \left( \begin{array} { c } { X _ { 0 } } \\ { \varepsilon _ { 2 } ^ { * } } \end{array} \right) \sim N \left[ \left( \begin{array} { c } { 10 } \\ { 0 } \end{array} \right) , \left( \begin{array} { c c } { 2 ^ { 2 } } & { 0 } \\ { 0 } & { 2 ^ { 2 } } \end{array} \right) \right] , \left( \begin{array} { c } { X _ { 0 } } \\ { \varepsilon _ { 3 } ^ { * } } \end{array} \right) \sim N \left[ \left( \begin{array} { c } { 10 } \\ { 0 } \end{array} \right) , \left( \begin{array} { c c } { 2 ^ { 2 } } & { 3 } \\ { 3 } & { 2 ^ { 2 } } \end{array} 
 \right) \right]
 $$
 
