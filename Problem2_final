@@ -28,10 +28,9 @@ summary(probit)
 
 ## b) [0.5P] Are the S.E. valid, or do you need to adjust them for heteroscedasticity? Explain
 
-#### The Maximum Likelihood Estimation (MLE) is derived from the log-likelihood function which is a logarithmic transformation of
-###  a joint probability density function of the given sample, where the distribution of y depends on x. The derived MLE is assumed 
-### to be asymptotically consistent and efficient with an asymptotic Variance which depends on Hi(beta; yi), which in general is a function of xi,
-###  i.e. MLE is heteroscedastic. 
+#### The Maximum Likelihood Estimation (MLE) is assumed to be asymptotically consistent and efficient and has a asymptotic Variance which depends on Hi(beta; yi), which in general is a function of xi,
+###  i.e. MLE is heteroscedastic. The MLE is derived from the log-likelihood function which is a logarithmic transformation of
+###  a joint probability density function of the given sample, where the distribution of y depends on x. 
 ### Therefore, in the estimation of the coefficients through the MLE method, the heteroskedasticity in Var(y|x) is automatically accounted 
 ### for and there is no need to further test for it. The estimated Standard Errors are asymptotic (since they are simply the square root on the Avar(MLE))
 ### and can be used to conduct the asymptotic t-test and confidence intervals. Therefore, the S. E. is valid when the sample size is large.
