@@ -90,7 +90,7 @@ xb2 <- designmat.2 %*% beta.2
 ## Calculate marginal probability effect for each probit model:
 
 mpe1 <- dnorm(xb1)*beta.1[2]
-mpe2 <- dnorm(xb2)*(beta.2[2] + 2*beta.2[2])
+mpe2 <- dnorm(xb2)*(beta.2[2] + 2*beta.2[3]*ldl)
 
 ## Plot them together:
 
