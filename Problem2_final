@@ -64,15 +64,69 @@ summary(probit3)
 ## i. [1P] Based on the estimated coefficients from a) and d) draw the two resulting marginal probability effects of ldl as a function of 
 ## ldl for ldl ∈ [1; 15] next to each other.
 
-## Getting probit predictors for both models
+## Extract regression coefficients:
 
-xb1 <-probit$linear.predictors
-xb2 <-probit3$linear.predictors
+beta.1 <- as.numeric(probit$coefficients)
+beta.2 <- as.numeric(probit3$coefficients)
 
-mpe_1 <-(dnorm(xb1)*(probit$coefficients[2]))
-mpe_2 <-(dnorm(xb2)*(probit3$coefficients[2]+ 2*probit3$coefficients[3]*data$ldl))
+## Prepare design matrices:
 
-plot1<-plot(data$ldl,mpe_1)
-plot2<-plot(data$ldl,mpe_2)
+ldl <- seq(1, 15, 0.01)
+ldl.square <- ldl^2
+int <- rep(1, length(ldl))
+
+designmat.1 <- as.matrix(data.frame("intercept" = int, 
+                                    "ldl" = ldl))
+
+designmat.2 <- as.matrix(data.frame("intercept" = int, 
+                                    "ldl" = ldl, 
+                                    "ldl.square" = ldl.square))
+
+## Calculate linear predictor:
+
+xb1 <- designmat.1 %*% beta.1
+xb2 <- designmat.2 %*% beta.2
+
+## Calculate marginal probability effect for each probit model:
+
+mpe1 <- dnorm(xb1)*beta.1[2]
+mpe2 <- dnorm(xb2)*(beta.2[2] + 2*beta.2[2])
+
+## Plot them together:
+
+plot(x = ldl, 
+     y = mpe1, 
+     t= "l", 
+     col="red", 
+     lwd=2, 
+     xlim=c(1,15),
+     ylim=c(min(mpe1, mpe2), max(mpe1, mpe2)),
+     main = "MPE for ldl in two probit models",
+     ylab = "MPE")
+
+lines(x = ldl, y = mpe2, t= "l", col="blue", lwd=2)
+
+legend("right", legend = c("just ldl", "ldl + ldl²"), fill=c("red", "blue"))
+
+
+## ii. [0.5P] Are any of the marginal probability effects linear in ldl? Explain why.
+
+## In Probit model, to calculate the Marginal Probability Effects (MPE) we are transforming the linear prediction of the beta estimators through the pdf, non of the the MEP is therefore linear. 
+## Moreover, as we are dealing with non-linear model the Marginal Probability Effect is estimated for every observation sperepatly. In the 
+##To obtain the "overall" average value for the whole sample we can calculate the mean of all the MPEs (recommendated) or take the MPE of an average for the sample ovservarion, however that average 
+## observation may acctually not exist in reality.  
+
+
+## iii. [1P] What is the advantage of the marginal probability effect based on the estimation in d) over the one based on a)? Explain shortly.
+
+## Adding ldl^2 variable allows us to estimate wether the marginal effect of ldl on probability increases or decreases as the ldl is higher, 
+## as oppose to model a) where we assume stricktly linear of ldl on probability. 
+## In estimation d) the marginal effect of ldl^2  has a negative coefficient, which tells us that the popability function of P(Y=1|ldl) is concaved and 
+## will reach its maximum when dP/dldl is equal to 0.
+## Interpretation: Until certain level (in our case ~ 11 see plot 2) the increase of ldl will increase the chances of the getting the heart disease, however above this level the
+## impact of increase of ldl on the probability of getting heart disease will be smaller. Sense check : Once the individual reaches certain level of ldl it is
+## very likely they have a heart disease, therefore even further increase of ldl has a smaller impact on probability of getting heart disease. 
+## This interpretation is not possible based on the estimation a), where we can only observed that increase in the ldl level increases the probability 
+## of getting the heart disease. 
 
 
