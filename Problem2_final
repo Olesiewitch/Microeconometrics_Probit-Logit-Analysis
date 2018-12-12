@@ -28,11 +28,13 @@ summary(probit)
 
 ## b) [0.5P] Are the S.E. valid, or do you need to adjust them for heteroscedasticity? Explain
 
-#### The probability of getting heart disease is Brenoulli distributed with the variance depend on P(yi=1|xi),which is a function of xi ("built-in" heteroscedasticity). 
-### The Maximum Likelihood Estimaton is calculated from given sample and derived based on the log-likelihood; a logarithmic transformation of joint 
-### probability density function, where distribution of y depends on x. Therefore, the assimptotic Variance of the MLE is a function of xi. Consequently, in the MLE heteroskedasticity
-### is automatically accounted for and there is no need to further test for it. The estimated Standard Errors are assimptotic and can be 
-### used to conduct the asimptotic t-test and calculate confidence intervals.   
+#### The Maximum Likelihood Estimation (MLE) is derived from the log-likelihood function which is a logarithmic transformation of
+###  a joint probability density function of the given sample, where the distribution of y depends on x. The derived MLE is assumed 
+### to be asymptotically consistent and efficient with an asymptotic Variance which depends on Hi(beta; yi), which in general is a function of xi,
+###  i.e. MLE is heteroscedastic. 
+### Therefore, in the estimation of the coefficients through the MLE method, the heteroskedasticity in Var(y|x) is automatically accounted 
+### for and there is no need to further test for it. The estimated Standard Errors are asymptotic (since they are simply the square root on the Avar(MLE))
+### and can be used to conduct the asymptotic t-test and confidence intervals. Therefore, the S. E. is valid when the sample size is large.
 
 ## c) [2P] Re-estimate the model from a) but this time include age in addition to ldl. You see that the estimated coefficient of ldl changes. 
 ##  Explain why? Additionally, show that your explanation is supported by the data. 
