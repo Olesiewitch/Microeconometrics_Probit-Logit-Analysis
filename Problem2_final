@@ -111,11 +111,14 @@ legend("right", legend = c("just ldl", "ldl + ldl²"), fill=c("red", "blue"))
 
 ## ii. [0.5P] Are any of the marginal probability effects linear in ldl? Explain why.
 
-## In Probit model, to calculate the Marginal Probability Effects (MPE) we are transforming the linear prediction of the beta estimators through the pdf, non of the the MEP is therefore linear. 
-## Moreover, as we are dealing with non-linear model the Marginal Probability Effect is estimated for every observation sperepatly. In the 
-##To obtain the "overall" average value for the whole sample we can calculate the mean of all the MPEs (recommendated) or take the MPE of an average for the sample ovservarion, however that average 
-## observation may acctually not exist in reality.  
-
+## In Probit model, to calculate the Marginal Probability Effects (MPE) we are transforming the linear prediction 
+## of the beta estimators through the pdf, which indicates that non of the the MEP is therefore linear. 
+## An increase in "ldl" by one unit leads to an increment in the marginal probability by pdf(x'b)' * b' where
+## pdf(x'b)' is the derivative of the standard-normal CDF (pdf) evaluated at all linear predictor x'b and b' is the coefficient 
+## of the particular regressor for which the MPE is to be estimated. 
+## The value of the MPE with respect to that one regressor therefore depends on the value of all other regressors 
+## and is thus contingent on the individual observation. Therefore, the Marginal Probability Effect is estimated for every observation
+## sperepatly.  
 
 ## iii. [1P] What is the advantage of the marginal probability effect based on the estimation in d) over the one based on a)? Explain shortly.
 
@@ -129,4 +132,27 @@ legend("right", legend = c("just ldl", "ldl + ldl²"), fill=c("red", "blue"))
 ## This interpretation is not possible based on the estimation a), where we can only observed that increase in the ldl level increases the probability 
 ## of getting the heart disease. 
 
+## iv. [1.5P] Calculate and properly interpret both marginal probability effects for the mean value of ldl in the sample (You do not need to 
+## compute standard errors).
 
+Probit_at_ldl_mean1<-probitmfx(data$chd~data$ldl,data=data,atmean=TRUE)
+Probit_at_ldl_mean2 <- probitmfx(data$chd~data$ldl+I(data$ldl^2),data=data,atmean=TRUE)
+Probit_at_ldl_mean1
+Probit_at_ldl_mean2
+## In the model a), dF/dx of ldl at mean is equal to 0.0609. 
+## Interpretation: The marginal probability in the sample suggest that for an individual with the exact mean characteristics
+## increase of their ldl-cholesterol by one unit, increases their probability of getting the heart disease by 6.09 procentage points. 
+## The probability of failling to reject the null  hypotheses (Ho: AMPE = 0) is less then 1%.
+
+## In model d), dF/dx of ldl at mean is equal to 0.1362 and of ldl^2 at mean is equal to - 0.006. 
+
+ldl_ldlsq <- (-0.136/(2*(-0.006)))
+ldl_ldlsq
+##Interpretation: At 10% sygnifficance level, for an individual with the exact mean characteristics increase of their ldl-cholesterol by one unit, 
+## increases their probability of getting the heart disease by 11.33 procentage points. 
+
+### v.
+## No, none of the computed in iv) effects are ceteris paribus since we have only one control variable ldl.
+## In the model from d), once we fix the value of ldl at the  mean the value of ldl^2 is also automatically fixed at (mean of ldl)^2. Therefore,in both models there is only one variable, which can cause change in the result
+## and that is ldl.This means that once we fix the value of ldl at mean, the is no other variables that we need to control for
+## - there is no chance for change in the outcome caused by another variable .
