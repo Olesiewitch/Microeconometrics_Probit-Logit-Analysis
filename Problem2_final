@@ -122,7 +122,7 @@ legend("right", legend = c("just ldl", "ldl + ldl²"), fill=c("red", "blue"))
 ## iii. [1P] What is the advantage of the marginal probability effect based on the estimation in d) over the one based on a)? Explain shortly.
 
 ## Adding ldl^2 variable allows us to estimate wether the marginal effect of ldl on probability increases or decreases as the ldl is higher, 
-## as oppose to model a) where we assume stricktly linear of ldl on probability. 
+## as oppose to model a) where we assume stricktly linear effect of ldl on probability, independent of value of ldl. 
 ## In estimation d) the marginal effect of ldl^2  has a negative coefficient, which tells us that the popability function of P(Y=1|ldl) is concaved and 
 ## will reach its maximum when dP/dldl is equal to 0.
 ## Interpretation: Until certain level (in our case ~ 11 see plot 2) the increase of ldl will increase the chances of the getting the heart disease, however above this level the
