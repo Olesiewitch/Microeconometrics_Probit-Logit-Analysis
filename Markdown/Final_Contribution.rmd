@@ -116,9 +116,9 @@ estBeta2 <- round(probit2$coefficients[2], 2)
 estBeta3 <- round(probit3$coefficients[2], 2)
 ```
 
-Given our simulated Data, we calculate the Probit model $G ( \cdot )$ to get the Maximum Likelihood estimator $\hat { \beta } _ {j  }$:
+Given our simulated Data, we calculate the Probit model for the binary dependent variable y given x to estimate the Maximum Likelihood estimator $\hat { \beta } _ {j  }$:
 $$
-\pi = G \left( \mathbf { x } ^ { \prime } \beta \right) = \Phi \left( \mathbf { x } ^ { \prime } \beta \right) = \int _ { - \infty } ^ { \mathbf { x } ^ { * } \beta } \frac { 1 } { \sqrt { 2 \pi } } \exp \left[ - \left( z ^ { 2 } / 2 \right) \right] \mathrm { d } z
+f \left( y _ { i } | \mathbf { x } _ { i } \right) = \left[ \Phi \left( \mathbf { x } _ { i } ^ { \prime } \mathbf { \beta } \right) \right] ^ { y _ { i } } \left[ 1 - \Phi \left( \mathbf { x } _ { i } ^ { \prime } \boldsymbol { \beta } \right) \right] ^ { \mathbf { - y } _ { i } } \quad y _ { i } = 0,1
 $$
 The estimates for $\hat { \beta } _ { 1 } , \hat { \beta } _ { 2 } \text{ and } \hat { \beta } _ { 3 }$ are `r estBeta1`, `r estBeta2` and `r estBeta3` respectively.
 
