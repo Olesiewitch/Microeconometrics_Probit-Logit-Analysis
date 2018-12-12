@@ -27,7 +27,7 @@ V1 <- matrix(c(4,0,0,1), nrow=2, ncol=2)
 V2 <- matrix(c(4,0,0,4), nrow=2, ncol=2)
 V3 <- matrix(c(4,3,3,4), nrow=2, ncol=2)
 
-# 1.a) Simulate three Datasets with Y, xNull and error -------------------
+# 1.a) Simulate three Datasets with Y, xNull and error -------------------------
 
 ## Simulate distributions with given means and Covariance; round xNull 
 distr1 <- rmvnorm(obs, mean = c(10,0) ,sigma = V1 , method = 'eigen') %>% as.data.frame() 
