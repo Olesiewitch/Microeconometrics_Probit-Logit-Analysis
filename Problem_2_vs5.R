@@ -62,7 +62,7 @@ summary(probit5)
 ## + "Therefore, seeing that the two coefficients for ldk are diffrent we may suspect ldl correlation with age." 
 ##    whats the 2nd coef?
 
-correlation_ldl_age <- cor(data$ldl, data$age)
+(correlation_ldl_age <- cor(data$ldl, data$age))
 print(correlation_ldl_age)
 
 ##  -> Bingo! As expected, "ldl" and "age" are not indepentend. Age is very commonly related to higher chances of heart 
