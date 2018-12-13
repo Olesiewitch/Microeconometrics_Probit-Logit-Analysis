@@ -48,7 +48,7 @@ summary(probit2)
 ##    we may suspect that "ldl" and "age" are not independent. Plausibility check: older people in the sample may tend to
 ##    have higher levels of cholesterol. Now, let's check for that in the data:
 
-correlation_ldl_age <- cor(data$ldl, data$age)
+correlation_ldl_age <- cor.test(data$ldl, data$age)
 print(correlation_ldl_age)
 
 ## Bingo! As expected, "ldl" and "age" are not independent and the level of ldl is dependent on age. In the first model, the "ldl" coefficient 
@@ -105,25 +105,24 @@ plot(x = ldl,
 
 lines(x = ldl, y = mpe2, t= "l", col="blue", lwd=2)
 
-legend("right", legend = c("just ldl", "ldl + ldl²"), fill=c("red", "blue"))
+legend("right", legend = c("ldl", "ldl + ldl²"), fill=c("red", "blue"))
 
 
 ## ii. [0.5P] Are any of the marginal probability effects linear in ldl? Explain why.
 
-## In Probit model, to calculate the Marginal Probability Effects (MPE) we are transforming the linear prediction 
-## of the beta estimators through the pdf, which indicates that non of the the MEP is therefore linear. 
-## An increase in "ldl" by one unit leads to an increment in the marginal probability by pdf(x'b)' * b' where
+## In Probit model, to calculate the MPE we are transforming the linear prediction 
+## of the beta estimators through the pdf multiplication, which indicates that non of the the MEP is therefore linear. 
+## An increase in "ldl" by one unit leads to an incremental change in the probability by pdf(x'b)' * b' where
 ## pdf(x'b)' is the derivative of the standard-normal CDF (pdf) evaluated at all linear predictor x'b and b' is the coefficient 
 ## of the particular regressor for which the MPE is to be estimated. 
 ## The value of the MPE with respect to that one regressor therefore depends on the value of all other regressors 
-## and is thus contingent on the individual observation. Therefore, the Marginal Probability Effect is estimated for every observation
-## sperepatly.  
+## and is estimated for every observation sperepatly.  
 
 ## iii. [1P] What is the advantage of the marginal probability effect based on the estimation in d) over the one based on a)? Explain shortly.
 
-## Adding ldl^2 variable allows us to estimate wether the marginal effect of ldl on probability increases or decreases as the ldl is higher, 
-## as oppose to model a) where we assume stricktly linear effect of ldl on probability, independent of value of ldl. 
-## In estimation d) the marginal effect of ldl^2  has a negative coefficient, which tells us that the popability function of P(Y=1|ldl) is concaved and 
+## Adding ldl^2 variable allows us to estimate whether the marginal effect of ldl on probability increases or decreases as the ldl is higher, 
+## as oppose to model a) where we assume stricktly linear effect of ldl on marginal probability, independent of value of ldl. 
+## In estimation d) the marginal effect of ldl^2  has a negative coefficient, which tells us that the marginal popability function of P(Y=1|ldl) is concaved and 
 ## will reach its maximum when dP/dldl is equal to 0.
 ## Interpretation: Until certain level (in our case ~ 11 see plot 2) the increase of ldl will increase the chances of the getting the heart disease, however above this level the
 ## impact of increase of ldl on the probability of getting heart disease will be smaller. Sense check : Once the individual reaches certain level of ldl it is
