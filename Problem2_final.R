@@ -1,0 +1,156 @@
+### Assesment 1 , Part 2 
+
+##Preparing the enviroment 
+remove(list=ls())
+library(foreign)
+library(mfx)
+library(margins)
+
+## Instrictions: Load the dataset “south_african_heart_disease_data.dta” and estimate the effect of ldl-
+##(bad)cholesterol (ldl) in blood on the probability of suffering from heart disease (chd equals 1 if one suffers from it). 
+
+## Loading the data
+data <- read.dta(file= "south_african_heart_disease_data.dta") 
+
+## Estimating effect ch ~ ldl
+
+probit<-glm(data$chd~data$ldl,family=binomial(link="probit"))
+summary(probit)
+
+##a) [0.5P] Can you learn anything from the estimated coefficients? Explain shortly. 
+
+## In non-linear regression models, such as the probit model, coefficients cannot be interpreted as marginal effects. In probit model, the coefficients could 
+## be interpreted with respect to the latent variable but since it has no specific unit, we cannot use any meaningful scale.
+##Therefore, the coefficients give only the signs of the partial effect of each x on the response probability, and its statistical significance by giving 
+## us the information whether we can reject null hypothesis at sufficiently small significance level. In presented model the estimated coefficient of ldl is positive 
+## and significant at < 1% level. Therefore, ldl-cholesterol increases the chances of suffering from the disease and is highly significant.  
+
+
+## b) [0.5P] Are the S.E. valid, or do you need to adjust them for heteroscedasticity? Explain
+
+#### The Maximum Likelihood Estimation (MLE) is assumed to be asymptotically consistent and efficient and has a asymptotic Variance which depends on Hi(beta; yi), which in general is a function of xi,
+###  i.e. MLE is heteroscedastic. The MLE is derived from the log-likelihood function which is a logarithmic transformation of
+###  a joint probability density function of the given sample, where the distribution of y depends on x. 
+### Therefore, in the estimation of the coefficients through the MLE method, the heteroskedasticity in Var(y|x) is automatically accounted 
+### for and there is no need to further test for it. The estimated Standard Errors are asymptotic (since they are simply the square root on the Avar(MLE))
+### and can be used to conduct the asymptotic t-test and confidence intervals. Therefore, the S. E. is valid when the sample size is large.
+
+## c) [2P] Re-estimate the model from a) but this time include age in addition to ldl. You see that the estimated coefficient of ldl changes. 
+##  Explain why? Additionally, show that your explanation is supported by the data. 
+
+probit2<-glm(data$chd~data$ldl+data$age,family=binomial(link="probit"))
+summary(probit2)
+
+###   In the second model, the coefficients are estimated under the ceteris paribus assumption ("all else being equal"), 
+##    meaning that while estimating each of them we control for the effect of all other predictor variables in the model. 
+##    If both variables were independent, the coefficient of "ldl" should not change in the second model when controling 
+##    for "age". Therefore, seeing that the two coefficients for "ldl" have changed compared to the model without "age",
+##    we may suspect that "ldl" and "age" are not independent. Plausibility check: older people in the sample may tend to
+##    have higher levels of cholesterol. Now, let's check for that in the data:
+
+correlation_ldl_age <- cor.test(data$ldl, data$age)
+print(correlation_ldl_age)
+
+## Bingo! As expected, "ldl" and "age" are not independent and the level of ldl is dependent on age. In the first model, the "ldl" coefficient 
+## captured some of the "ldl" variations on "age". When explicitly entering "age" as a regressor, that part of the variance in "ldl" is removed. 
+
+
+## d) Finally, estimate the model from a) but include ldl squared next to ldl as a control variable.
+
+probit3<-glm(data$chd~poly(data$ldl,2, raw= TRUE),family=binomial(link="probit"))
+summary(probit3)
+
+## i. [1P] Based on the estimated coefficients from a) and d) draw the two resulting marginal probability effects of ldl as a function of 
+## ldl for ldl ∈ [1; 15] next to each other.
+
+## Extract regression coefficients:
+
+beta.1 <- as.numeric(probit$coefficients)
+beta.2 <- as.numeric(probit3$coefficients)
+
+## Prepare design matrices:
+
+ldl <- seq(1, 15, 0.01)
+ldl.square <- ldl^2
+int <- rep(1, length(ldl))
+
+designmat.1 <- as.matrix(data.frame("intercept" = int, 
+                                    "ldl" = ldl))
+
+designmat.2 <- as.matrix(data.frame("intercept" = int, 
+                                    "ldl" = ldl, 
+                                    "ldl.square" = ldl.square))
+
+## Calculate linear predictor:
+
+xb1 <- designmat.1 %*% beta.1
+xb2 <- designmat.2 %*% beta.2
+
+## Calculate marginal probability effect for each probit model:
+
+mpe1 <- dnorm(xb1)*beta.1[2]
+mpe2 <- dnorm(xb2)*(beta.2[2] + 2*beta.2[3]*ldl)
+
+## Plot them together:
+
+plot(x = ldl, 
+     y = mpe1, 
+     t= "l", 
+     col="red", 
+     lwd=2, 
+     xlim=c(1,15),
+     ylim=c(min(mpe1, mpe2), max(mpe1, mpe2)),
+     main = "MPE for ldl in two probit models",
+     ylab = "MPE")
+
+lines(x = ldl, y = mpe2, t= "l", col="blue", lwd=2)
+
+legend("right", legend = c("ldl", "ldl + ldl²"), fill=c("red", "blue"))
+
+
+## ii. [0.5P] Are any of the marginal probability effects linear in ldl? Explain why.
+
+## In Probit model, to calculate the MPE we are transforming the linear prediction 
+## of the beta estimators through the pdf multiplication, which indicates that non of the the MEP is therefore linear. 
+## An increase in "ldl" by one unit leads to an incremental change in the probability by pdf(x'b)' * b' where
+## pdf(x'b)' is the derivative of the standard-normal CDF (pdf) evaluated at all linear predictor x'b and b' is the coefficient 
+## of the particular regressor for which the MPE is to be estimated. 
+## The value of the MPE with respect to that one regressor therefore depends on the value of all other regressors 
+## and is estimated for every observation sperepatly.  
+
+## iii. [1P] What is the advantage of the marginal probability effect based on the estimation in d) over the one based on a)? Explain shortly.
+
+## Adding ldl^2 variable allows us to estimate whether the marginal effect of ldl on probability increases or decreases as the ldl is higher, 
+## as oppose to model a) where we assume stricktly linear effect of ldl on marginal probability, independent of value of ldl. 
+## In estimation d) the marginal effect of ldl^2  has a negative coefficient, which tells us that the marginal popability function of P(Y=1|ldl) is concaved and 
+## will reach its maximum when dP/dldl is equal to 0.
+## Interpretation: Until certain level (in our case ~ 11 see plot 2) the increase of ldl will increase the chances of the getting the heart disease, however above this level the
+## impact of increase of ldl on the probability of getting heart disease will be smaller. Sense check : Once the individual reaches certain level of ldl it is
+## very likely they have a heart disease, therefore even further increase of ldl has a smaller impact on probability of getting heart disease. 
+## This interpretation is not possible based on the estimation a), where we can only observed that increase in the ldl level increases the probability 
+## of getting the heart disease. 
+
+## iv. [1.5P] Calculate and properly interpret both marginal probability effects for the mean value of ldl in the sample (You do not need to 
+## compute standard errors).
+
+Probit_at_ldl_mean1<-probitmfx(data$chd~data$ldl,data=data,atmean=TRUE)
+Probit_at_ldl_mean2 <- probitmfx(data$chd~data$ldl+I(data$ldl^2),data=data,atmean=TRUE)
+Probit_at_ldl_mean1
+Probit_at_ldl_mean2
+## In the model a), dF/dx of ldl at mean is equal to 0.0609. 
+## Interpretation: The marginal probability in the sample suggest that for an individual with the exact mean characteristics
+## increase of their ldl-cholesterol by one unit, increases their probability of getting the heart disease by 6.09 procentage points. 
+## The probability of failling to reject the null  hypotheses (Ho: AMPE = 0) is less then 1%.
+
+## In model d), dF/dx of ldl at mean is equal to 0.1362 and of ldl^2 at mean is equal to - 0.006. 
+
+ldl_ldlsq <- (-0.136/(2*(-0.006)))
+ldl_ldlsq
+##Interpretation: At 10% sygnifficance level, for an individual with the exact mean characteristics increase of their ldl-cholesterol by one unit, 
+## increases their probability of getting the heart disease by 11.33 procentage points. 
+
+### v.
+## No, none of the computed in iv) effects are ceteris paribus since we have only one control variable ldl.
+## In the model from d), once we fix the value of ldl at the  mean the value of ldl^2 is also automatically fixed at (mean of ldl)^2. Therefore,in both models there is only one variable, which can cause change in the result
+## and that is ldl.This means that once we fix the value of ldl at mean, the is no other variables that we need to control for
+## - there is no chance for change in the outcome caused by another variable .
