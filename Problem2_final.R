@@ -132,22 +132,24 @@ legend("right", legend = c("ldl", "ldl + ldl²"), fill=c("red", "blue"))
 
 ## iv. [1.5P] Calculate and properly interpret both marginal probability effects for the mean value of ldl in the sample (You do not need to 
 ## compute standard errors).
+mean_ldl= mean(data$ldl)
 
-Probit_at_ldl_mean1<-probitmfx(data$chd~data$ldl,data=data,atmean=TRUE)
-Probit_at_ldl_mean2 <- probitmfx(data$chd~data$ldl+I(data$ldl^2),data=data,atmean=TRUE)
-Probit_at_ldl_mean1
-Probit_at_ldl_mean2
+mpe1_mean <- dnorm(beta.1[1]+ beta.1[2]*mean_ldl)*(beta.1[2])
+mpe2_mean <- dnorm(beta.2[1]+ beta.2[2]*mean_ldl+beta.2[3]*mean_ldl^2)*(beta.2[2] + 2*beta.2[3]*mean_ldl)
+
 ## In the model a), dF/dx of ldl at mean is equal to 0.0609. 
+
 ## Interpretation: The marginal probability in the sample suggest that for an individual with the exact mean characteristics
+
 ## increase of their ldl-cholesterol by one unit, increases their probability of getting the heart disease by 6.09 procentage points. 
 ## The probability of failling to reject the null  hypotheses (Ho: AMPE = 0) is less then 1%.
 
-## In model d), dF/dx of ldl at mean is equal to 0.1362 and of ldl^2 at mean is equal to - 0.006. 
 
-ldl_ldlsq <- (-0.136/(2*(-0.006)))
-ldl_ldlsq
 ##Interpretation: At 10% sygnifficance level, for an individual with the exact mean characteristics increase of their ldl-cholesterol by one unit, 
-## increases their probability of getting the heart disease by 11.33 procentage points. 
+## increases their probability of getting the heart disease by 8.08 procentage points. 
+
+
+
 
 ### v.
 ## No, none of the computed in iv) effects are ceteris paribus since we have only one control variable ldl.
