@@ -20,10 +20,10 @@ Kevin Hope, ID: 598247, Msc Statistics, <Kevin.Hoppe1@web.de>
 ```{r, echo = FALSE}
 library("kableExtra")
 a=c("1.a","1.b","1.b i)","1.b ii)", "1.b iii)","1.c","1.c i)","1.c ii)","1.c iii)","2.a","2.b","2.c","2.d i)","2.d ii)","2.d iii)","2.d iv)","2.d v)")
-b=c("100% programming + 80% theory","100% programming + 70% theory","100% programming + 40% theory", "50% theory","100% theory","100% programming","40% theory","90% theory","50% theory","-","-","50% theory","-","30% theory","-","20% theory","-") 
-c= c("-", "-","40% theory","50% theory","-", "-","50% theory","- ","50% theory","100% theory + programming ","100% theory","50% theory + 100% programming","-","40% theory","100% theory ","40% theory + 100% programming","80% theory") 
+b=c("100% programming + 80% theory","100% programming + 70% theory","100% programming + 40% theory", "50% theory","90% theory","100% programming","40% theory","100%","50% theory","-","-","50% theory","-","30% theory","-","20% theory","-") 
+c= c("-", "-","40% theory","50% theory","-", "-","50% theory","- ","50% theory","100% theory + programming ","100% theory","50% theory + 100% programming","-","40% theory","100% theory ","40% theory + 100% programming","90% theory") 
  
-d= c("20% theory","30% theory","20% theory","-", "10% theory","-", "10% theory ","-","-","-","-","-", "100% programming ","30% theory","-","40% theory","20% theory")
+d= c("20% theory","30% theory","20% theory","-", "10% theory","-", "10% theory ","10% theory","-","-","-","-", "100% programming ","30% theory","-","40% theory","10% theory")
 
 work = data.frame(a,b,c,d)
 colnames(work)= c("Task","Johannes","Malgorzata","Kevin")
@@ -185,7 +185,7 @@ denBeta1 <- density(betaEst1, bw = "nrd0", adjust = 1.5, kernel = "gaussian")
 denBeta2 <- density(betaEst2, bw = "nrd0", adjust = 1.5, kernel = "gaussian")
 denBeta3 <- density(betaEst3, bw = "nrd0", adjust = 1.5, kernel = "gaussian")
 
-png(filename="Plot2.png", height = 370)
+png(filename="Plot2.png", height = 360)
 
 plot(denBeta1$x,denBeta1$y,type="l",xlim = c(min(betaEst1) ,max(betaEst1)),
      xlab = "Estimated Coefficients of Beta 1", ylab = "Density", main ="Plot 2: Density Plot for Population 1")
@@ -196,7 +196,7 @@ abline(v=mean(betaEst1))
 dev.off()
 
 
-png(filename="Plot1.png")
+png(filename="Plot1.png", height = 360)
 
 plot(denBeta1$x,denBeta1$y,type="l",xlim = c(1.85 ,4.4), ylim = c(0, 13),
      xlab = "Estimated Coefficients", ylab = "Density", main ="Plot 1: Density Plot of Estimates of Beta 1")
@@ -240,7 +240,7 @@ As we can see in Plot 1 all 3 distributions are approximatly normal distributed,
 
 Given the assumptions stated in i), we expect the estimate of ${\hat \beta } _ { 1 }$ in this population to be close to the true value of 4, as it is the case. 
 In the second population our errors have a variance greater than 1. This results in a decreased estimate of ${\hat \beta } _ { 1 }$, since the probit estimator is derived as being equal to ${\beta / \sigma}$ with $\sigma$ being the standard deviation of our error term.
-In the third population we can additionaly observe a covariance greater than zero between the explanatory variable and the error term in our latent model. Therefore our error term is not independent of the explanatory variable in our latent model as requested by a.). In this case it does not make much sense to compare the estimates from population three to the other ones, since the probit estimator can not be derived as being equal to ${\beta / \sigma}$ anymore. 
+In the third population we can additionaly observe a covariance greater than zero between the explanatory variable and the error term in our latent model. Therefore our error term is not independent of the explanatory variable in our latent model as requested by a.). In this case it does not make much sense to compare the estimates from population three to the other ones, since the probit estimator can not be consistently estimated as being equal to ${\beta / \sigma}$ anymore. 
 
 ## iii.) [1P] 
 
@@ -351,7 +351,7 @@ The relative difference between $\hat { E } [ A M P E | j = 1 ]$ and $\hat { E }
 
 Taking into account that AMPE depends on the value of $\hat { \beta }_1$, the results in c-i) and c-ii) are not intuitive, since in Plot 1 $\hat { \beta }_1$ for population 1 and 3 are much closer to each other than to $\hat { \beta }_1$ for population 2.
 
-However, since we know that in case of population 2 - where the error term does not follow a standard normal, but is still uncorrelated  with ${x_1}$ - the attentuation bias in ${\beta / \sigma}$ will average out across its distribution during the AMPE estimation. Since both our AMPE estimators of poulation j = 1 and j = 2 are consistant, we expect the AMPE estimates to concentrate approximately around the same value and their relative difference to be very small (c-ii). If we look at Plot 3, we see that both distributions are in fact close, with $\hat { E } [ A M P E | j = 2 ]$ being slightly bigger than  $\hat { E } [ A M P E | j = 1 ]$. Since the variance of the error term in population j = 2 is greater than 1, we assume to be dealing with neglected heterogeneity here, which adds an unknown constant to our partial effects in the probit.
+However, since we know that in case of population 2 - where the error term does not follow a standard normal, but is still uncorrelated  with ${x_1}$ - the attentuation bias in ${\beta / \sigma}$ will average out across its distribution during the AMPE estimation. Since both our AMPE estimators of poulation j = 1 and j = 2 are consistant, we expect the AMPE estimates to concentrate approximately around the same value and their relative difference to be very small (c-ii). If we look at Plot 3, we see that both distributions are in fact close, with $\hat { E } [ A M P E | j = 2 ]$ being slightly bigger than  $\hat { E } [ A M P E | j = 1 ]$. Since the variance of the error term in population j = 2 is greater than 1, we could be dealing with neglected heterogeneity here, which adds an unknown effect to our partial effects in the probit.
 
 In population 3 we also deal with suspected unobserved heterogenity with the variance of the error term being greater than 1. However, here the error term is correlated with ${x_1}$ and the probit is clearly heteroscedastic with regard to the explamatory variable. In this case it is not possible to estimate $\hat { \beta } _ { 1 }$ and $\hat { E } [ A M P E | j = 3 ]$ consistantly. The violation of our model assumptions explain the relatively big discrepancy between $\hat { E } [ A M P E | j = 1 ]$ and $\hat { E } [ A M P E | j = 3 ]$. This can be observed in Plot 3 and results in the relative big difference calculated in c)i. 
 
