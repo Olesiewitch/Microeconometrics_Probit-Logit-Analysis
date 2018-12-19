@@ -294,6 +294,6 @@ mean_ldl= mean(data$ldl)
 mpe1_mean <- dnorm(beta.1[1]+ beta.1[2]*mean_ldl)*(beta.1[2])
 mpe2_mean <- dnorm(beta.2[1]+ beta.2[2]*mean_ldl+beta.2[3]*mean_ldl^2)*(beta.2[2] + 2*beta.2[3]*mean_ldl)
 
-# get model parameters
+# calculate MPEs with probitmfx for comparison
 Probit_at_ldl_mean1 <- probitmfx(data$chd~data$ldl,data=data,atmean=TRUE)
 Probit_at_ldl_mean2 <- probitmfx(data$chd~data$ldl+I(data$ldl^2),data=data,atmean=TRUE)
