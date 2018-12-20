@@ -141,7 +141,7 @@ library(texreg, quietly = TRUE) # for printing the probit model
 #dir <- "~/R/git/Micro_Ass1/Markdown"
 #setwd(dir)
 
-setwd("C:/Users/Nutzer/Desktop")
+setwd("~/R/git/Micro_Ass1/Markdown")
 
 # clear environment
 rm(list = ls())
@@ -406,7 +406,7 @@ relDiff1 <- round(abs((mean(AMPEEst1) - mean(AMPEEst3)) / mean(AMPEEst3)*100),2)
 ```
 We calculate the relative difference:
 $$
-\text{relative difference} = \left| \frac { x - y } { max ( x , y ) } \right| \cdot 100 \%
+\text{relative difference} = \left| \frac { x - y } { max ( x , y ) } \right| 
 $$
 
 The relative difference between $\hat { E } [ A M P E | j = 1 ]$ and  $\hat { E } [ A M P E | j = 3 ]$ is `r relDiff1` percent.
