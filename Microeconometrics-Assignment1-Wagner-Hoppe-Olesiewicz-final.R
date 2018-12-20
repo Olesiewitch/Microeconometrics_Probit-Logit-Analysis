@@ -287,10 +287,10 @@ abline(v=mean(data$ldl))
 legend("right", legend = c("ldl", "ldl + ldl²"), fill=c("red", "blue"))
 dev.off()
 
-## Calculate MPE at means
+## Calculate mean of ldl
 mean_ldl= mean(data$ldl)
 
-# calculate MPEs
+# calculate MPEs at mean
 mpe1_mean <- dnorm(beta.1[1]+ beta.1[2]*mean_ldl)*(beta.1[2])
 mpe2_mean <- dnorm(beta.2[1]+ beta.2[2]*mean_ldl+beta.2[3]*mean_ldl^2)*(beta.2[2] + 2*beta.2[3]*mean_ldl)
 
