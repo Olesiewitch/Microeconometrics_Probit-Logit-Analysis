@@ -1,0 +1,106 @@
+---
+title: "Assesment 2"
+author: "Malgorzata Olesiewicz"
+date: "31 January 2019"
+output: pdf_document
+---
+---
+title: "Microeconometrics 2018/2019 - 1st Assignment"
+date: "20th of December, 2018"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+fontsize: 11pt
+---
+
+#### Instructor: Tomas Repasky
+#### Group Members: 
+- Johannes Wagner  
+Humboldt-Universitat Berlin - ID 598797 - Msc Statistics  
+<wagnejoh@hu-berlin.de>
+- Malgorzata Paulina Olesiewicz  
+Humboldt-Universitat Berlin - ID 598939 - Msc Statistics  
+<malgorzata.paulina.olesiewicz@student.hu-berlin.de>
+
+- Kevin Hoppe  
+Humboldt-Universitat Berlin - ID 598247 -  Msc Statistics  
+<Kevin.Hoppe1@web.de>  
+
+## Approximate individual contributions: 
+```{r, echo = FALSE}
+suppressWarnings(library("kableExtra"))
+
+a=c("1",
+    "2",
+    "3",
+    "4") 
+   
+
+b=c("70% progr. + 50% theory",
+    "70% progr. + 70% theory",
+    "70% progr. + 30% theory",
+    "33% theory") 
+
+c= c("-", 
+     "-",
+     "40% theory",
+     "33% theory") 
+ 
+d= c("30% progr. + 50% theory", 
+     "30% progr. + 30% theory",
+     "30% progr. + 30% theory",
+      "30% progr. + 30% theory")
+
+work = data.frame(a,b,c,d)
+colnames(work)= c("Task","Johannes","Malgorzata","Kevin")
+kable(work)%>% kable_styling() 
+```
+
+
+$$
+\pagebreak
+$$
+
+
+```{r setup, include=FALSE}
+### Setting up the enviroment
+library(foreign, quietly = TRUE)
+library(foreign, quietly = TRUE)
+library(margins, quietly = TRUE)
+library(mfx, quietly = TRUE)
+library(caret,quietly = TRUE)
+```
+
+```{r}
+### loading the data and looking up meaning of the variables
+
+data=read_dta("loanapp1.dta")
+(variables=cbind(colnames(data),attr(data, "var.labels")))
+names(data)
+head(data)
+```
+
+##Chosing the variables for the model
+
+To create the logit model we have chosen fallowig variables: 
+
+1. Gender (gender)
+2. Loan amount (loanamt)
+3. Married (married)
+4. Monthly income (appinc)
+5. Morgage history (mortno)
+6. Net worth (netw)
+7. Age (old) 
+
+
+
+```{r}
+model=glm(data$approve~data$gender+data$loanamt+data$married+data$appinc+data$mortno+data$netw+data$old, data=data, family = "binomial")
+summary(model)
+```
+
+###Results interpretation
+
+
+###Sensitivity and Specificity
+
