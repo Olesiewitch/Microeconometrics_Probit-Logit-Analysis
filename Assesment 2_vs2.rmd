@@ -1,0 +1,147 @@
+---
+title: "Assesment 2"
+author: "Malgorzata Olesiewicz"
+date: "31 January 2019"
+output: pdf_document
+---
+---
+title: "Microeconometrics 2018/2019 - 1st Assignment"
+date: "20th of December, 2018"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+fontsize: 11pt
+---
+
+#### Instructor: Tomas Repasky
+#### Group Members: 
+- Johannes Wagner  
+Humboldt-Universitat Berlin - ID 598797 - Msc Statistics  
+<wagnejoh@hu-berlin.de>
+- Malgorzata Paulina Olesiewicz  
+Humboldt-Universitat Berlin - ID 598939 - Msc Statistics  
+<malgorzata.paulina.olesiewicz@student.hu-berlin.de>
+
+- Kevin Hoppe  
+Humboldt-Universitat Berlin - ID 598247 -  Msc Statistics  
+<Kevin.Hoppe1@web.de>  
+
+## Approximate individual contributions: 
+```{r, echo = FALSE}
+suppressWarnings(library("kableExtra"))
+
+a=c("1",
+    "2",
+    "3",
+    "4") 
+   
+
+b=c("33 % theory",
+    "100% theory",
+    "-",
+    "??") 
+
+c= c("33 % theory", 
+     "-",
+     "100% theory + progr",
+     "??") 
+ 
+d= c("33% theory", 
+     "-",
+     "-",
+      "100% progr + ??")
+
+work = data.frame(a,b,c,d)
+colnames(work)= c("Task","Johannes","Malgorzata","Kevin")
+kable(work)%>% kable_styling() 
+```
+
+
+$$
+\pagebreak
+$$
+
+
+```{r setup, include=FALSE}
+### Setting up the enviroment
+library(foreign, quietly = TRUE)
+library(foreign, quietly = TRUE)
+library(margins, quietly = TRUE)
+library(mfx, quietly = TRUE)
+library(caret,quietly = TRUE)
+install.packages("InformationValue")
+library(InformationValue)
+```
+
+```{r}
+### loading the data and looking up meaning of the variables
+
+data=read_dta("loanapp1.dta")
+(variables=cbind(colnames(data),attr(data, "var.labels")))
+names(data)
+head(data)
+```
+
+## Task 1 : Chosing the variables for the model
+
+To create the logit model we have chosen fallowig variables: 
+
+1. Gender (gender)
+2. Loan amount (loanamt)
+3. Married (married)
+4. Monthly income (appinc)
+5. Morgage history (mortno)
+6. Net worth (netw)
+7. Age (old) 
+
+
+
+```{r}
+model=glm(data$approve~data$gender+data$loanamt+data$married+data$appinc+data$mortno+data$netw+data$old, data=data, family = "binomial"(link="logit"))
+summary(model)
+
+```
+
+###Results interpretation
+
+```{r}
+logit_results=logitmfx(data$approve~data$gender+data$loanamt+data$married+data$appinc+data$mortno+data$netw+data$old, data=data, atmean= TRUE)
+logit_results
+```
+###Sensitivity and Specificity
+
+The notion of sensitivity and specificity is used to describe how accurately model predicts the binary outcomes. Sensitivity describes the fraction of correctly predicted positive (Y=1) outcomes and specificity describes the fraction of correctly predicted negative (Y=0) outcomes. Our aim is to find an optimal equilibrium between the two fractions, which would allow us simultaneously the best possible prediction of both outcomes.    
+
+In our prediction, we use "c" as a threshold above which the outcome should be predicted as a positive. Consequently, any result of our predicted logit model which will be equal or below the threshold will be assigned a negative outcome. 
+
+The most logical starting point for the binary response prediction model in c =0.5 
+
+```{r}
+table(data$approve)
+predicted=predict(model,data, type="response")
+sen_1=sensitivity(data$approve,predicted,threshold = 0.5)
+spec_1=specificity(data$approve,predicted,threshold = 0.5)
+sen_1 
+spec_1
+```
+
+With threshold c=0.5 we can observe very high fraction of positive responds being correctly predicted but none of the negative responds have been predicted correctly.Since the closer the threshold to 1 the higher specificity (the likelihood that we will predict negative respond increases) we will increase the threshold to 0.8 
+```{r}
+sen_2=sensitivity(data$approve,predicted,threshold = 0.8)
+spec_2=specificity(data$approve,predicted,threshold = 0.8)
+sen_2
+spec_2
+```
+We can observe some improvment in prediction of negative outcome but it is still very low - only 11,8% of negative responds are predicted correctly. To find out optimal cut off threshold for the prediction we have used the "InformationValue" package.
+
+```{r}
+a= optimalCutoff(actuals = data$approve, predictedScores = predicted,  returnDiagnostics=TRUE)
+sen_3=sensitivity(data$approve,predicted,threshold = a)
+spec_3=specificity(data$approve,predicted,threshold = a)
+sen_3
+spec_3
+```
+
+The optimal cut off level is: , where x% of positive respons is being predicted correctly and z% of negative respons is being predicted correctly. 
+
+### Multinomial Logit
