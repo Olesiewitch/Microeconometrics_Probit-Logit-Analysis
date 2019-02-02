@@ -1,0 +1,165 @@
+---
+title: "Assesment 2"
+author: "Malgorzata Olesiewicz"
+date: "31 January 2019"
+output: pdf_document
+---
+---
+title: "Microeconometrics 2018/2019 - 1st Assignment"
+date: "20th of December, 2018"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+fontsize: 11pt
+---
+
+#### Instructor: Tomas Repasky
+#### Group Members: 
+- Johannes Wagner  
+Humboldt-Universitat Berlin - ID 598797 - Msc Statistics  
+<wagnejoh@hu-berlin.de>
+- Malgorzata Paulina Olesiewicz  
+Humboldt-Universitat Berlin - ID 598939 - Msc Statistics  
+<malgorzata.paulina.olesiewicz@student.hu-berlin.de>
+
+- Kevin Hoppe  
+Humboldt-Universitat Berlin - ID 598247 -  Msc Statistics  
+<Kevin.Hoppe1@web.de>  
+
+## Approximate individual contributions: 
+```{r, echo = FALSE}
+suppressWarnings(library("kableExtra"))
+
+a=c("1",
+    "2",
+    "3",
+    "4") 
+   
+
+b=c("33 % theory",
+    "100% theory",
+    "-",
+    "??") 
+
+c= c("33 % theory", 
+     "-",
+     "100% theory + progr",
+     "??") 
+ 
+d= c("33% theory", 
+     "-",
+     "-",
+      "100% progr + ??")
+
+work = data.frame(a,b,c,d)
+colnames(work)= c("Task","Johannes","Malgorzata","Kevin")
+kable(work)%>% kable_styling() 
+```
+
+
+$$
+\pagebreak
+$$
+
+
+```{r setup, include=FALSE}
+### Setting up the enviroment
+library(foreign, quietly = TRUE)
+library(tidyverse, quietly = TRUE)
+library(margins, quietly = TRUE)
+library(mfx, quietly = TRUE)
+library(caret,quietly = TRUE)
+# install.packages("InformationValue")
+library(InformationValue)
+library(olsrr)
+```
+
+```{r, echo=FALSE}
+# Define Directory
+dir <- "~/R/git/Micro_Ass1"
+
+setwd(dir)
+# clear environment
+rm(list = ls())
+### loading the data and looking up meaning of the variables
+
+data <- read.dta("loanapp1.dta")
+(variables=cbind(colnames(data),attr(data, "var.labels")))
+names(data)
+head(data)
+
+# Model Selection ---------------------------------------------------------
+# For simplicity reasons we can use a simple OLS model for the selection process
+# remove variables which are directly related to rejection and have no social explanatory power: unver
+# remove missings for the purpose of model selection
+data_woNA <- data[complete.cases(data),] %>% dplyr::select(-c(approve, action, unver))
+# names(data_woNA)
+# regress the depend variable on all regressors
+fit <- lm(reject~.,data=data_woNA)
+
+## Perform forward stepwise selection to find most important variables
+ols_step_forward_p(fit, details = FALSE, penter = 0.001)
+```
+
+## Task 1 : Chosing the variables for the model
+
+The choice of variables should be grounded on both theory and empirical evidence. Our first step was to look at a simple linear regression model for all variables of the data set and did run a forward stepwise selection process on them. We choose a very restrictive significance level of 0.1 % (p-value = 0.001) for our regressors to throw out all regressors with a lower significance level. We obtained nine variables, which could be ordered with regard to their explanatory power (how much they contribute to the Adjusted R square). We then choose five variables from the list of nine with regard to the power of their theoretical contribution to answering the research question and their empirical explanatory power for our sample. Furthermore, for mainly theoretical reasons, we added two variables to control for relevant social characteristics (sch and married). Our theoretocal perspective is guided by the assumption that higher social, cultural and economical capital leads to a lower probability of receiving a loan rejection.
+
+To create the logit model we have chosen followig variables: 
+
+1. Education (sch): [0,1]
+2. marital status (married): [0,1]
+3. Existence of private mortage insurance (inson): [0,1]
+4. Credit History (cons): [1,2,3,4,5,6]
+5. Former bankruptcy (pubrec): [0,1]
+6. Ethnic majority (white): [0,1]
+7. Ratio of income and liabilities (obrat) : [0-95]
+
+```{r, , echo=FALSE}
+## Calculate logit model with MPEs at means
+dataSelect <- dplyr::select(data, c(reject, sch, married, inson, cons, pubrec, white, obrat))
+logit_results <- logitmfx(reject~sch + married + inson + cons + pubrec + white + obrat, data = dataSelect, atmean=TRUE)
+logit_results
+```
+
+
+###Results interpretation
+
+
+###Sensitivity and Specificity
+
+The notion of sensitivity and specificity is used to describe how accurately model predicts the binary outcomes. Sensitivity describes the fraction of correctly predicted positive (Y=1) outcomes and specificity describes the fraction of correctly predicted negative (Y=0) outcomes. Our aim is to find an optimal equilibrium between the two fractions, which would allow us simultaneously the best possible prediction of both outcomes.    
+
+In our prediction, we use "c" as a threshold above which the outcome should be predicted as a positive. Consequently, any result of our predicted logit model which will be equal or below the threshold will be assigned a negative outcome. 
+
+The most logical starting point for the binary response prediction model in c =0.5 
+
+```{r}
+table(data$approve)
+predicted=predict(model,data, type="response")
+sen_1=sensitivity(data$approve,predicted,threshold = 0.5)
+spec_1=specificity(data$approve,predicted,threshold = 0.5)
+sen_1 
+spec_1
+```
+
+With threshold c=0.5 we can observe very high fraction of positive responds being correctly predicted but none of the negative responds have been predicted correctly.Since the closer the threshold to 1 the higher specificity (the likelihood that we will predict negative respond increases) we will increase the threshold to 0.8 
+```{r}
+sen_2=sensitivity(data$approve,predicted,threshold = 0.8)
+spec_2=specificity(data$approve,predicted,threshold = 0.8)
+sen_2
+spec_2
+```
+We can observe some improvment in prediction of negative outcome but it is still very low - only 11,8% of negative responds are predicted correctly. To find out optimal cut off threshold for the prediction we have used the "InformationValue" package.
+
+```{r}
+a= optimalCutoff(actuals = data$approve, predictedScores = predicted,  returnDiagnostics=TRUE)
+sen_3=sensitivity(data$approve,predicted,threshold = a)
+spec_3=specificity(data$approve,predicted,threshold = a)
+sen_3
+spec_3
+```
+
+The optimal cut off level is: , where x% of positive respons is being predicted correctly and z% of negative respons is being predicted correctly. 
+
+### Multinomial Logit
