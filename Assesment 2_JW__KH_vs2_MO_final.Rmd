@@ -72,6 +72,13 @@ library(caret,quietly = TRUE)
 # install.packages("InformationValue")
 library(InformationValue)
 library(olsrr)
+# install.packages("nnet")
+library(nnet)
+library(dplyr)
+# install.packages("mlogit")
+library(mlogit)
+
+
 ```
 
 ```{r, echo=FALSE}
@@ -110,10 +117,10 @@ The choice of variables should be grounded on both theory and empirical evidence
 
 To create the logit model we have chosen followig variables: 
 
-1. Education (sch): [0,1]; expected 
-2. marital status (married): [0,1]
+1. Education of 12 or more years (sch): [0,1]; expected 
+2. Marital status (married): [0,1]
 3. Existence of private mortage insurance (inson): [0,1]
-4. Credit History (cons): [1,2,3,4,5,6]
+4. Credit History (cons): [1,2,3,4,5,6] 
 5. Former bankruptcy (pubrec): [0,1]
 6. Ethnic majority (white): [0,1]
 7. Ratio of income and liabilities (obrat) : [0-95]
@@ -174,3 +181,145 @@ print(spec_3)
 The optimal cut off level is c=0.088 where 76% of positive respons is being predicted correctly and 72% of negative respons is being predicted correctly. 
 
 ### Multinomial Logit
+
+
+---
+title: "Microeconometrics Assignment 2 - Task 4"
+author: "KH"
+date: "3 Februar 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+setwd("C:/Users/Nutzer/Desktop")
+
+## Packages:
+
+require(foreign)
+require(margins)
+require(mfx)
+require(dplyr)
+require(tidyverse)
+require(nnet)
+require(mlogit)
+
+```
+
+
+
+```{r, include=FALSE}
+
+## Load data and extract the 7 variables that we chose 
+## as a group:
+##
+## 1. Education (sch): [0,1]
+## 2. marital status (married): [0,1]
+## 3. Existence of private mortgage insurance (inson): [0,1]
+## 4. Net worth (netw): [-7919, 28023]
+## 5. Former bankruptcy (pubrec): [0,1]
+## 6. Ethnic majority (white): [0,1]
+## 7. Ratio of income and liabilities (obrat) : [0-95]
+
+dat.raw <- read.dta("loanapp1.dta")
+dat.red <- select(dat.raw, reject, sch, married, inson, cons, pubrec, white, obrat, netw); as.tibble(dat.red)
+
+## Coding categorial variables as dummy variables:
+
+dummy.var <- function(var){
+  
+  if(min(unique(var), na.rm = T) == 0){
+    var <- var + 1
+  }
+  
+  len.var <- length(var)
+  levels.var <- var %>% as.factor %>% levels %>% length
+  levels.dummy <- levels.var - 1
+  
+  dummy <- matrix(NA,
+                  nrow = len.var,
+                  ncol = levels.dummy)
+
+  for(j in 1:levels.var){
+    
+    match.loc <- which(var == unique(var)[j])
+    
+    for(i in match.loc){
+      
+      dummy.vec <- rep(0, levels.dummy)
+      dummy.vec[unique(var)[j] - 1] <- 1
+      dummy[i,] <- dummy.vec
+    }
+  }
+  return(dummy)
+}
+
+sch <- dummy.var(dat.red$sch); head(sch)
+married <- dummy.var(dat.red$married); head(married)
+inson <- dummy.var(dat.red$inson); head(inson)
+#cons <- dummy.var(dat.red$cons); head(cons)
+pubrec <- dummy.var(dat.red$pubrec); head(pubrec)
+white <- dummy.var(dat.red$white); head(white)
+
+## Put together data set for regression models:
+
+dat <- data.frame("reject" = dat.red$reject,
+                  "educ" = sch,
+                  "marry" = married,
+                  "insur" = inson,
+                  "netw" = dat.red$netw,
+                  "bankr" = pubrec,
+                  "white" = white,
+                  "oblig" = dat.red$obrat)
+
+dat.mnl <- mlogit.data(dat, shape = "wide", choice = "reject")
+
+## Formulas for regression models:
+
+form <- 'reject ~ educ + marry + insur + netw + bankr + white + oblig'
+
+form.mnl <- mFormula(appr ~ educ + marry + insur + netw + bankr + white + oblig)
+
+## Estimate a binomial logit model:
+
+head(dat); binom <- glm(formula = form, data = dat, family = "binomial"(link = "logit"))
+summary(binom)
+
+## Estimate a multinomial logit model:
+
+head(dat.mnl); multinom <- multinom(formula = form, data = dat)
+summary(multinom)
+
+## Comparison of coefficient estimates:
+
+beta.diff <- cbind(coef(binom) - coef(multinom)); beta.diff
+
+```
+
+
+The difference in the coefficient estimates is zero up to at least the fourth 
+decimal place:
+
+```{r, echo = FALSE, include = TRUE}
+
+beta.diff
+
+
+```
+
+
+This is because the multinomial logit model (MNL) reduces to the 
+binomial logit model in case of a binomial dependent variable as can be seen in the formulas. In the MNL, the probability $\pi_{ij}$ of individual $i$ choosing alternative $j$ is given by:
+
+  $$ \pi_{ij_{multinomial}} = \frac{\exp(x_{i}'\beta_{j})}{\sum_{r=1}^J \exp{x_{i}'\beta_{j}}}. $$
+
+Compare this to the binomial logit model, where the probability $\pi_{i}$ of individual $i$ 
+picking alternative $j = 1$ is given by:
+
+  $$ \pi_{i_{binomial}} = \frac{\exp(x_{i}'\beta)}{1 + \exp(x_{i}'\beta)}.  $$
+  
+In the MNL, due to identification constraints, $\beta_{1}$ is fixed at $0$. This establishes $j = 1$ as the reference category. For the remaining $J-1$ categories, $\beta_{j}$ coefficients are estimated. If the dependent variable has only two categories, i.e. $J = 2$, this means that only one $\beta$ and one $\pi_{i}$ need to be calculated (for the one category that is not the reference category) so the index $j$ in $\pi_{ij}$ and $\beta_{j}$ can be dropped. Since the constraint for $\beta_{1} = 0$ means that $\exp{(x_{i}'\beta_{1})}$ evaluates to $1$, this reduces the denominator in the MNL to $1 + \exp(x_{i}'\beta_{2})$. After dropping the now obsolete index of the coefficient vector, the two formulas given above are equal.
+
+
+
