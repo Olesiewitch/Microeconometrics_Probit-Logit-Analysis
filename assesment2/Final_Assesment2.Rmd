@@ -29,19 +29,19 @@ e=c("1",
     "3",
     "4") 
    
-f=c("33 % theory + 100% programming",
-    "33% theory",
-    "33% theory",
-    "33% theory") 
-g= c("33 % theory", 
-     "33% theory",
-     "33% theory + 100% programming",
-     "33% theory") 
+f=c("1/3 theory + programming",
+    "1/3 theory",
+    "1/3 theory",
+    "1/3 theory") 
+g= c("1/3 theory", 
+     "1/3 theory",
+     "1/3 theory + programming",
+     "1/3 theory") 
  
-h= c("33% theory", 
-     "33% theory",
-     "33% theory",
-      "33% theory+100% programming")
+h= c("1/3 theory", 
+     "1/3 theory",
+     "1/3 theory",
+      "1/3 theory+ programming")
 work = data.frame(e,f,g,h)
 colnames(work)= c("Task","Johannes","Malgorzata","Kevin")
 kable(work)%>% kable_styling() 
@@ -70,6 +70,7 @@ library(nnet)
 library(dplyr)
 #install.packages("mlogit")
 library(mlogit)
+library(kableExtra)
 ```
 
 ```{r, include = FALSE}
@@ -86,31 +87,39 @@ data <- read.dta("loanapp1.dta")
 # remove variables which are directly related to rejection and have no explanatory power given our social theory: unver
 # remove missings for the purpose of model selection
 data_woNA <- data[complete.cases(data),] %>% dplyr::select(-c(approve, action, unver))
-# names(data_woNA)
 # regress the depend variable on all regressors
 fit <- lm(reject~.,data=data_woNA)
 ## Perform forward stepwise selection to find most important variables
-#ols_step_forward_p(fit, details = FALSE, penter = 0.001)
+ols_step_forward_p(fit, details = FALSE, penter = 0.001)
 ## Select the four significant variables which can be explained trough our theory:
 # inson, pubrec, white, obrat
-```
 
-```{r, echo=FALSE}
 ## Calculate logit model with MPEs at means
 dataSelect <- dplyr::select(data, c(reject, sch, married, netw, inson, pubrec, white, obrat))
 dataSelect <- dataSelect[complete.cases(dataSelect),] 
-# logit_results <- logitmfx(reject~sch + married + inson + cons + pubrec + white + obrat, data = dataSelect, atmean=TRUE)
-# logit_results
-model=glm(reject~sch + married + netw + inson + pubrec + white + obrat, data =data, family = "binomial"(link="logit"))
+logit_MPresults <- logitmfx(reject~sch + married + netw + inson + pubrec + white + obrat, data = dataSelect, atmean=TRUE)
+# Logit Model
+model=glm(reject~sch + married + netw + inson + pubrec + white + obrat, data =dataSelect, family = "binomial"(link="logit"))
+
+
+## Calculate the probability for the average individual in our sample:
+# Vector of Means
+mean<-c(mean(dataSelect$sch),mean(dataSelect$married),mean(dataSelect$netw),mean(dataSelect$inson),mean(dataSelect$pubrec),mean(dataSelect$white),mean(dataSelect$obrat))
+dim(mean)<-c(1,7)
+names(mean)<-c("sch","married","netw","inson","pubrec","white","obrat");mean
+# add Intercept
+mean<-cbind(1,mean)
+# Calculate P(Y=1|X) for Mean values in the sample
+Prob1=1/(1+exp(-(model$coefficients%*%t(mean))))
 ```
+
 
 ## Task 1 : Chosing the variables for the model
 
-The choice of variables should be grounded on both theory and empirical evidence. Our theoretical perspective is guided by the assumption that higher social, cultural and economical capital leads to a lower probability of receiving a loan rejection. Therefore we choose three variables, which represent relevant social characteristics given our theory: marriage, networth and educational level.  
-Our next step was to look at a simple linear regression model for all variables of the data set and run a forward stepwise selection process on them. We obtained nine highly relevant variables and choose another four variables from this list, with respect to their suitability to our theory.  
+The choice of variables should be grounded on both theory and empirical evidence. Our theoretical perspective is guided by the assumption that higher social, cultural and economical capital leads to a lower probability of rejection. First, we choose three indicators, which represent relevant social characteristics given our theory and can be represented by variables: Education, Marital Status and Wealth.  
+Our next step was to run a forward stepwise selection process on all our variables to identify those with the highest empirical relevance. We obtained nine highly relevant variables and choose another four variables from this list, with respect to their suitability to our theory.  
 
-To create the logit model we have chosen followig variables with regard to our theory: 
-
+To create the logit model (table 1) we have chosen followig variables with regard to our theory: 
 
 ```{r , echo=FALSE}
 a=c("Education (cultural capital)",
@@ -144,19 +153,24 @@ d= c("-",
      "-",
      "+") 
 vars = data.frame(a,b,c,d)
-colnames(vars)= c("Indicator","Variable","Scale", "Expected Effect")
+colnames(vars)= c("indicator","variable","scale", "expected effect")
 kable(vars)%>% kable_styling()
 ```
 
-
+Given our seven explanatory variables, we can now estimate the conditional probability of being rejected ($\mathrm { P } \left( Y = 1 | X = \overline { \mathbf { x } } \right)$). For our sample the estimated probability of rejection given an individual with average characteristics is 9.04 %.
 
 ##Task 2 :Results interpretation
 
-You can not directly compare the magnitude of the coefficients of explanatory variables with different scales. For interpretation, we usually want to use coefficients as marginal effects given a little change in the explanatory variable. Since the effect of a "unit change" can mean quite different effects given the scale of the variable, you can not compare variables with different scales. Also one has to keep in mind that the coefficients of the Logit are non-linear parameters. However, in case the variables have the same scale or are standardized, it is possible to compare the size of their coefficients since the logit function is strictly monotonically increasing. Before interpreting the magnitude, one should be aware that the coefficients are random representations of the true parameter and the confidence level of two or more parameters being different needs to be tested. Also coefficients need to be transformed into probabilities before they can be compared and interpreted in a meaningfull way.    
+Just looking at our estimated coefficients we can not say which one has the biggest effect on our dependent variable. That is because we can not directly compare the magnitude of coefficients from explanatory variables with different scales. For interpretation, we usually want to use coefficients as marginal probability effects given a little change in the explanatory variable. Since the effect of a "unit change" can mean quite different effects given the scale of the variable, you can not compare variables with different scales. For example, given our variables, a unit change in the binary variable pubrec represents the difference between just two options (Yes/No) while a unit change in obrat just represents  one step on the scale of many options. In addition, you have to have in mind, that the coefficients are random variables and have to be tested for them being significantly different from zero and them being significantly different from each other. Also before making any interpretations, coefficient should be transformed into marginal probability effects.  
+
 
 ```{r , echo=FALSE}
+## Print the Logit Model and the estimated probabilities with MPE at means
 fm1.table <- xtable(model)
 kable(fm1.table, caption = "Logit Model")%>% kable_styling()
+
+#fm2.table <- xtable(logit_MPresults[1])
+# kable(logit_MPresults[1], caption = "Logit Model with MPE at means")%>% kable_styling()
 ```
 
 ##Task 3 :Sensitivity and Specificity
@@ -167,7 +181,7 @@ In our prediction, we use $"c"$ as a threshold above which the outcome should be
 
 The most logical starting point for the binary response prediction model in $c =0.5 $
 
-```{r, echo=False}
+```{r, echo=FALSE}
 
 predicted=predict(model,dataSelect, type="response")
 sen_1=sensitivity(dataSelect$reject,predicted,threshold = 0.5)
@@ -181,7 +195,7 @@ kable(vars_1)%>% kable_styling()
 With threshold $c=0.5$ we can observe that almost all (99%) negative responds but only 24%of the positive responds have been predicted correctly.Since the closer the threshold $"c"$ to 1 the higher specificity (the likelihood that we will predict negative respond increases) we will decrease the threshold to 0.3. 
 
 
-```{r, echo=False}
+```{r, echo=FALSE}
 sen_2=sensitivity(dataSelect$reject,predicted,threshold = 0.3)
 spec_2=specificity(dataSelect$reject,predicted,threshold = 0.3)
 vars_2 = data.frame("0.3",sen_2, spec_2)
@@ -190,7 +204,7 @@ kable(vars_2)%>% kable_styling()
 ```
 We can observe some improvment in prediction of positive outcomes to 36% while keeping the prediction of negative outomes still very accurate - 96%. We are going in the right direction.To find out optimal cut off threshold for the prediction we have used the "InformationValue" package.
 
-```{r, echo=False}
+```{r, echo=FALSE}
 cut= optimalCutoff(actuals = dataSelect$reject, predictedScores =predicted,optimiseFor="Both")
 sen_3=sensitivity(dataSelect$reject,predicted,threshold =cut)
 spec_3=specificity(dataSelect$reject,predicted,threshold =cut)
