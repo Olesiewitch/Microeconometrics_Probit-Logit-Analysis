@@ -179,7 +179,7 @@ The notion of sensitivity and specificity is used to describe how accurately mod
 
 In our prediction, we use $"c"$ as a threshold above which the outcome should be predicted as a positive. Consequently, any result of our predicted logit model which will be equal or below the threshold will be assigned as a negative outcome. 
 
-The most logical starting point for the binary response prediction model in $c =0.5 $
+The most logical starting point for the binary response prediction model in $c =0.5$
 
 ```{r, echo=FALSE}
 
@@ -307,17 +307,3 @@ picking alternative $j = 1$ is given by:
   $$ \pi_{i_{binomial}} = \frac{\exp(x_{i}'\beta)}{1 + \exp(x_{i}'\beta)}.  $$
   
 In the MNL, due to identification constraints, $\beta_{1}$ is fixed at $0$. This establishes $j = 1$ as the reference category. For the remaining $J-1$ categories, $\beta_{j}$ coefficients are estimated. If the dependent variable has only two categories, i.e. $J = 2$, this means that only one $\beta$ and one $\pi_{i}$ need to be calculated (for the one category that is not the reference category) so the index $j$ in $\pi_{ij}$ and $\beta_{j}$ can be dropped. Since the constraint for $\beta_{1} = 0$ means that $\exp{(x_{i}'\beta_{1})}$ evaluates to $1$, this reduces the denominator in the MNL to $1 + \exp(x_{i}'\beta_{2})$. After dropping the now obsolete index of the coefficient vector, the two formulas given above are equal.
-
-    © 2019 GitHub, Inc.
-    Terms
-    Privacy
-    Security
-    Status
-    Help
-
-    Contact GitHub
-    Pricing
-    API
-    Training
-    Blog
-    About
