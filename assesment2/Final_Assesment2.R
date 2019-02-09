@@ -72,6 +72,16 @@ dataSelect <- dataSelect[complete.cases(dataSelect),]
 # logit_results
 model=glm(reject~sch + married + netw + inson + pubrec + white + obrat, data =data, family = "binomial"(link="logit"))
 
+## Calculate the probability for the average individual in our sample:
+# Vector of Means
+mean<-c(mean(dataSelect$sch),mean(dataSelect$married),mean(dataSelect$netw),mean(dataSelect$inson),mean(dataSelect$pubrec),mean(dataSelect$white),mean(dataSelect$obrat))
+dim(mean)<-c(1,7)
+names(mean)<-c("sch","married","netw","inson","pubrec","white","obrat");mean
+# add Intercept
+mean<-cbind(1,mean)
+# Calculate P(Y=1|X) for Mean values in the sample
+Prob1=1/(1+exp(-(model$coefficients%*%t(mean))))
+
 ##Task 3 :Sensitivity and Specificity
 
 ##1
