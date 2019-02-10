@@ -62,15 +62,15 @@ library(margins, quietly = TRUE)
 library(mfx, quietly = TRUE)
 library(caret,quietly = TRUE)
 # install.packages("InformationValue")
-library(InformationValue)
-library(xtable)
-library(olsrr)
+library(InformationValue, quietly = TRUE)
+library(xtable, quietly = TRUE)
+library(olsrr, quietly = TRUE)
 #install.packages("nnet")
-library(nnet)
-library(dplyr)
+library(nnet, quietly = TRUE)
+library(dplyr, quietly = TRUE)
 #install.packages("mlogit")
-library(mlogit)
-library(kableExtra)
+library(mlogit, quietly = TRUE)
+library(kableExtra, quietly = TRUE)
 ```
 
 ```{r, include = FALSE}
@@ -114,12 +114,12 @@ Prob1=1/(1+exp(-(model$coefficients%*%t(mean))))
 ```
 
 
-## Task 1 : Chosing the variables for the model
+## Task 1 : Choosing the variables
 
 The choice of variables should be grounded on both theory and empirical evidence. Our theoretical perspective is guided by the assumption that higher social, cultural and economical capital leads to a lower probability of rejection. First, we choose three indicators, which represent relevant social characteristics given our theory and can be represented by variables: Education, Marital Status and Wealth.  
 Our next step was to run a forward stepwise selection process on all our variables to identify those with the highest empirical relevance. We obtained nine highly relevant variables and choose another four variables from this list, with respect to their suitability to our theory.  
 
-To create the logit model (table 1) we have chosen followig variables with regard to our theory: 
+To create the logit model (table 1) we have chosen following variables with regard to our theory: 
 
 ```{r , echo=FALSE}
 a=c("Education (cultural capital)",
@@ -127,7 +127,7 @@ a=c("Education (cultural capital)",
     "Wealth in Dollar (economic capital)",
     "Appr. private insurance (economic capital)", 
     "Experience of bunkruptcy (economic capital)",
-    "Ethnical majority (social & cultural capital)",
+    "Ethnic majority (social & cultural capital)",
     "Ration of obligations vs. income (ecomoic capital)") 
    
 b=c("sch",
@@ -192,7 +192,7 @@ kable(vars_1)%>% kable_styling()
 ```
 
 
-With threshold $c=0.5$ we can observe that almost all (99%) negative responds but only 24%of the positive responds have been predicted correctly.Since the closer the threshold $"c"$ to 1 the higher specificity (the likelihood that we will predict negative respond increases) we will decrease the threshold to 0.3. 
+With threshold $c=0.5$ we can observe that almost all (99%) negative responds but only 24%of the positive responds have been predicted correctly. Since the closer the threshold $"c"$ to 1 the higher specificity (the likelihood that we will predict negative respond increases) we will decrease the threshold to 0.3. 
 
 
 ```{r, echo=FALSE}
@@ -202,7 +202,7 @@ vars_2 = data.frame("0.3",sen_2, spec_2)
 colnames(vars_2)= c("Threshold","Sensitivity","Specificity")
 kable(vars_2)%>% kable_styling()
 ```
-We can observe some improvment in prediction of positive outcomes to 36% while keeping the prediction of negative outomes still very accurate - 96%. We are going in the right direction.To find out optimal cut off threshold for the prediction we have used the "InformationValue" package.
+We can observe some improvement in prediction of positive outcomes to 36% while keeping the prediction of negative outcomes still very accurate - 96%. We are going in the right direction. To find out optimal cut off threshold for the prediction we have used the "InformationValue" package.
 
 ```{r, echo=FALSE}
 cut= optimalCutoff(actuals = dataSelect$reject, predictedScores =predicted,optimiseFor="Both")
@@ -213,7 +213,7 @@ colnames(vars_3)= c("Optimal Cut off","Sensitivity","Specificity")
 kable(vars_3)%>% kable_styling()
 ```
 
-The optimal cut off level is $c=0.118$ where 65% of positive respons is being predicted correctly and 83% of negative respons is being predicted correctly. 
+The optimal cut off level is $c=0.118$ where 65% of positive response is being predicted correctly and 83% of negative respons is being predicted correctly. 
 
 ### Taks4:  Multinomial Logit
 
