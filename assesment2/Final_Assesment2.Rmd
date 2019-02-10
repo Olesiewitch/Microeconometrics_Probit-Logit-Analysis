@@ -9,16 +9,23 @@ fontsize: 11pt
 ---
 
 ## Microeconometrics 2018/2019 
-# Assesment 2
+# Assignment 2
 
 ### Group Members: 
-Johannes Wagner, ID: 598797, Msc Statistics, <wagnejoh@hu-berlin.de>
+
+- Johannes Wagner  
+Humboldt-Universität Berlin - ID 598797 - Msc Statistics  
+<wagnejoh@hu-berlin.de>
+
+- Malgorzata Paulina Olesiewicz  
+Humboldt-Universität Berlin - ID 598939 - Msc Statistics  
+<malgorzata.paulina.olesiewicz@student.hu-berlin.de>
+
+- Kevin Hoppe  
+Humboldt-Universität Berlin - ID 598247 -  Msc Statistics  
+<Kevin.Hoppe1@web.de>  
 
 
-Malgorzata Paulina Olesiewicz, ID:598939, Msc Statistics, <malgorzata.paulina.olesiewicz@student.hu-berlin.de>
-
-
-Kevin Hope, ID: 598247, Msc Statistics, <Kevin.Hoppe1@web.de>   
 
 ## Approximate individual contributions: 
 
@@ -60,10 +67,12 @@ library(foreign, quietly = TRUE)
 library(tidyverse, quietly = TRUE)
 library(margins, quietly = TRUE)
 library(mfx, quietly = TRUE)
+#install.packages("caret")
 library(caret,quietly = TRUE)
 # install.packages("InformationValue")
 library(InformationValue, quietly = TRUE)
 library(xtable, quietly = TRUE)
+#install.packages("olsrr")
 library(olsrr, quietly = TRUE)
 #install.packages("nnet")
 library(nnet, quietly = TRUE)
@@ -77,7 +86,8 @@ library(kableExtra, quietly = TRUE)
 # clear environment
 rm(list = ls())
 # Define Directory
-dir <- "~/R/git/Micro_Ass1"
+#dir <- "~/R/git/Micro_Ass1"
+dir <- "C:/Users/Nutzer/Desktop"
 setwd(dir)
 ### loading the data and looking up meaning of the variables
 data <- read.dta("loanapp1.dta")
@@ -114,10 +124,9 @@ Prob1=1/(1+exp(-(model$coefficients%*%t(mean))))
 ```
 
 
-## Task 1 : Choosing the variables
+## Task 1: Choosing the variables
 
-The choice of variables should be grounded on both theory and empirical evidence. Our theoretical perspective is guided by the assumption that higher social, cultural and economical capital leads to a lower probability of rejection. First, we choose three indicators, which represent relevant social characteristics given our theory and can be represented by variables: Education, Marital Status and Wealth.  
-Our next step was to run a forward stepwise selection process on all our variables to identify those with the highest empirical relevance. We obtained nine highly relevant variables and choose another four variables from this list, with respect to their suitability to our theory.  
+The choice of variables should be grounded on both theory and empirical evidence. Our theoretical perspective is guided by the assumption that higher social, cultural and economical capital leads to a lower probability of rejection. First, we chose three variables representing relevant social characteristics given above theory that are stored in the variables "education", "marital status", and "wealth". We then used forward stepwise selection to identify those covariates with the highest empirical relevance for the dependent variable "rejection". From the resulting list of nine empirically highly relevant variables, we picked four that are also theoretically relevant, thus obtaining a total of seven regressors. 
 
 To create the logit model (table 1) we have chosen following variables with regard to our theory: 
 
@@ -125,10 +134,10 @@ To create the logit model (table 1) we have chosen following variables with rega
 a=c("Education (cultural capital)",
     "Marital Status (social capital)",
     "Wealth in Dollar (economic capital)",
-    "Appr. private insurance (economic capital)", 
-    "Experience of bunkruptcy (economic capital)",
+    "Private mortgage insurance (economic capital)", 
+    "Former bankruptcy (economic capital)",
     "Ethnic majority (social & cultural capital)",
-    "Ration of obligations vs. income (ecomoic capital)") 
+    "Ratio of obligations to income (economic capital)") 
    
 b=c("sch",
     "married",
@@ -153,15 +162,15 @@ d= c("-",
      "-",
      "+") 
 vars = data.frame(a,b,c,d)
-colnames(vars)= c("indicator","variable","scale", "expected effect")
+colnames(vars)= c("Indicator","Variable","Scale", "Expected effect")
 kable(vars)%>% kable_styling()
 ```
 
-Given our seven explanatory variables, we can now estimate the conditional probability of being rejected ($\mathrm { P } \left( Y = 1 | X = \overline { \mathbf { x } } \right)$). For our sample the estimated probability of rejection given an individual with average characteristics is 9.04 %.
+Given our seven explanatory variables, we can now estimate the conditional probability of a rejection. In our sample, the estimated probability of rejection for an individual with average characteristics is $\mathrm { P } \left( Y = 1 | X = \overline { \mathbf { x } } \right) = 9.04 \%$.
 
-##Task 2 :Results interpretation
+##Task 2: Results interpretation
 
-Just looking at our estimated coefficients we can not say which one has the biggest effect on our dependent variable. That is because we can not directly compare the magnitude of coefficients from explanatory variables with different scales. For interpretation, we usually want to use coefficients as marginal probability effects given a little change in the explanatory variable. Since the effect of a "unit change" can mean quite different effects given the scale of the variable, you can not compare variables with different scales. For example, given our variables, a unit change in the binary variable pubrec represents the difference between just two options (Yes/No) while a unit change in obrat just represents  one step on the scale of many options. In addition, you have to have in mind, that the coefficients are random variables and have to be tested for them being significantly different from zero and them being significantly different from each other. Also before making any interpretations, coefficient should be transformed into marginal probability effects.  
+Just looking at our estimated coefficients we can not say which one has the biggest effect on our dependent variable. That is because we can not directly compare the magnitude of coefficients from explanatory variables with different scales. For interpretation, we usually want to use coefficients as marginal probability effects given a little change in the explanatory variable. Since the effect of a "unit change" can mean quite different effects given the scale of the variable, you cannot compare variables with different scales. For example, given our variables, a unit change in the binary variable "pubrec" represents the difference between just two options (Yes/No) while a unit change in "obrat" just represents one step on a scale of many options. Furthermore, coefficients are random variables and have to be tested for them being significantly different from zero and from each other. Also, before making any interpretations, the coefficients should be transformed into marginal probability effects.  
 
 
 ```{r , echo=FALSE}
@@ -173,13 +182,13 @@ kable(fm1.table, caption = "Logit Model")%>% kable_styling()
 # kable(logit_MPresults[1], caption = "Logit Model with MPE at means")%>% kable_styling()
 ```
 
-##Task 3 :Sensitivity and Specificity
+##Task 3: Sensitivity and Specificity
 
-The notion of sensitivity and specificity is used to describe how accurately model predicts the binary outcomes. Sensitivity describes the fraction of correctly predicted positive $(Y=1)$ outcomes and specificity describes the fraction of correctly predicted negative $(Y=0)$ outcomes. Our aim is to find an optimal equilibrium between the two fractions, which would allow us simultaneously the best possible prediction of both outcomes.    
+The notion of sensitivity and specificity is used to describe how accurately a model predicts the binary outcomes. Sensitivity is the fraction of correctly predicted positive $(Y=1)$ outcomes and specificity describes the fraction of correctly predicted negative $(Y=0)$ outcomes. We aim to find an optimal equilibrium between the two fractions, which allows us the best possible simultaneous prediction of both outcomes.    
 
-In our prediction, we use $"c"$ as a threshold above which the outcome should be predicted as a positive. Consequently, any result of our predicted logit model which will be equal or below the threshold will be assigned as a negative outcome. 
+In our prediction, we use $c$ as a threshold above which the outcome is predicted to be positive. Consequently, any result of our logit model which will be equal or below the threshold will be precited to be negative. 
 
-The most logical starting point for the binary response prediction model in $c =0.5$
+The most logical starting point for the binary response prediction model is $c = 0.5$
 
 ```{r, echo=FALSE}
 
@@ -192,7 +201,7 @@ kable(vars_1)%>% kable_styling()
 ```
 
 
-With threshold $c=0.5$ we can observe that almost all (99%) negative responds but only 24%of the positive responds have been predicted correctly. Since the closer the threshold $"c"$ to 1 the higher specificity (the likelihood that we will predict negative respond increases) we will decrease the threshold to 0.3. 
+For $c = 0.5$, we observe that almost all (99%) negative responses but only 24% of the positive responses are predicted correctly. Since a threshold $c$ that is closer to 1 results in a higher specificity (the likelihood that we will predict negative responses increases) we will decrease the threshold to $c = 0.3$. 
 
 
 ```{r, echo=FALSE}
@@ -202,7 +211,7 @@ vars_2 = data.frame("0.3",sen_2, spec_2)
 colnames(vars_2)= c("Threshold","Sensitivity","Specificity")
 kable(vars_2)%>% kable_styling()
 ```
-We can observe some improvement in prediction of positive outcomes to 36% while keeping the prediction of negative outcomes still very accurate - 96%. We are going in the right direction. To find out optimal cut off threshold for the prediction we have used the "InformationValue" package.
+We observe some improvement in the accuracy of predicted positives (sensitivity now at 36%) while keeping the  specificity at a high level (now 96%). We are going in the right direction. To find the optimal prediction threshold $c$ we used the "InformationValue" package.
 
 ```{r, echo=FALSE}
 cut= optimalCutoff(actuals = dataSelect$reject, predictedScores =predicted,optimiseFor="Both")
@@ -213,7 +222,7 @@ colnames(vars_3)= c("Optimal Cut off","Sensitivity","Specificity")
 kable(vars_3)%>% kable_styling()
 ```
 
-The optimal cut off level is $c=0.118$ where 65% of positive response is being predicted correctly and 83% of negative respons is being predicted correctly. 
+The optimal cut-off level is $c=0.118$ where 65% of positive outcomes and 83% of negative outcomes are predicted correctly.
 
 ### Taks4:  Multinomial Logit
 
